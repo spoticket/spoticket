@@ -3,7 +3,7 @@ name: bug-report-template
 about: "\U0001F4DD Bug report issue"
 title: "[BUG]"
 labels: bug
-assignees: yoaruku
+assignees: ''
 
 ---
 
