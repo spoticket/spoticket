@@ -7,10 +7,9 @@ import com.spoticket.game.global.exception.CustomException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 import static com.spoticket.game.global.util.ErrorUtils.validateAndThrowIfInvalid;
 import static com.spoticket.game.global.util.ResponseUtils.*;
@@ -29,6 +28,11 @@ public class GameController {
     ) throws CustomException {
         validateAndThrowIfInvalid(result);
         return created(gameService.createGame(request));
+    }
+
+    @GetMapping("/{gameId}")
+    public DataResponse<GameResponse> getGame(@PathVariable UUID gameId) {
+        return ok(gameService.getGame(gameId));
     }
 
 }
