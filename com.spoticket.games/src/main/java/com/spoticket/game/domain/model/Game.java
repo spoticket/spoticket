@@ -1,19 +1,18 @@
 package com.spoticket.game.domain.model;
 
-import com.spoticket.game.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "p_games")
-public class Game extends BaseEntity {
+@Builder
+public class Game {
 
     @Id
     @GeneratedValue(generator = "UUID")
@@ -21,7 +20,7 @@ public class Game extends BaseEntity {
 
     private String title;
 
-    private Timestamp startTime;
+    private LocalDateTime startTime;
 
     @Enumerated(value = EnumType.STRING)
     private Sport sport;
@@ -33,5 +32,18 @@ public class Game extends BaseEntity {
     private UUID homeTeamId;
 
     private UUID awayTeamId;
+
+    public static Game of(String title, LocalDateTime startTime, Sport sport, String league,
+                          UUID stadiumId, UUID homeTeamId, UUID awayTeamId) {
+        return Game.builder()
+                .title(title)
+                .startTime(startTime)
+                .sport(sport)
+                .league(league)
+                .stadiumId(stadiumId)
+                .homeTeamId(homeTeamId)
+                .awayTeamId(awayTeamId)
+                .build();
+    }
 
 }
