@@ -1,5 +1,6 @@
 package com.spoticket.game.domain.model;
 
+import com.spoticket.game.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "p_games")
-public class Game {
+public class Game extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "UUID")
