@@ -3,6 +3,7 @@ package com.spoticket.game.global.util;
 import com.spoticket.game.global.exception.CustomException;
 import lombok.*;
 
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -12,6 +13,14 @@ public class ResponseUtils {
         return DataResponse.<T>builder()
                 .code(OK.value())
                 .msg(OK.getReasonPhrase())
+                .data(data)
+                .build();
+    }
+
+    public static <T> DataResponse<T> created(T data) {
+        return DataResponse.<T>builder()
+                .code(CREATED.value())
+                .msg(CREATED.getReasonPhrase())
                 .data(data)
                 .build();
     }
