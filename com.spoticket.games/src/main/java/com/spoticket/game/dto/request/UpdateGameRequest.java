@@ -2,27 +2,26 @@ package com.spoticket.game.dto.request;
 
 import com.spoticket.game.domain.model.Sport;
 import jakarta.validation.constraints.Future;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Getter;
 
 @Getter
 public class UpdateGameRequest {
 
-    private String title;
+  private String title;
 
-    @Future
-    private LocalDateTime startTime;
+  @Future
+  private LocalDateTime startTime;
 
-    private Sport sport;
+  private Sport sport;
 
-    private String league;
+  private String league;
 
-    private UUID stadiumId;
+  private UUID stadiumId;
 
-    private UUID homeTeamId;
+  private UUID homeTeamId;
 
-    private UUID awayTeamId;
+  private UUID awayTeamId;
 
 }
