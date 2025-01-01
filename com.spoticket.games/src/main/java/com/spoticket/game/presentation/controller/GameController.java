@@ -1,6 +1,7 @@
 package com.spoticket.game.presentation.controller;
 
 import com.spoticket.game.application.service.GameService;
+import com.spoticket.game.domain.repository.GameRepository;
 import com.spoticket.game.dto.request.CreateGameRequest;
 import com.spoticket.game.dto.response.GameResponse;
 import com.spoticket.game.global.exception.CustomException;
@@ -20,6 +21,7 @@ import static com.spoticket.game.global.util.ResponseUtils.*;
 public class GameController {
 
     private final GameService gameService;
+    private final GameRepository gameRepository;
 
     @PostMapping
     public DataResponse<GameResponse> createGame(
@@ -33,6 +35,12 @@ public class GameController {
     @GetMapping("/{gameId}")
     public DataResponse<GameResponse> getGame(@PathVariable UUID gameId) {
         return ok(gameService.getGame(gameId));
+    }
+
+    @DeleteMapping("/{gameId}")
+    public BasicResponse deleteGame(@PathVariable UUID gameId) {
+        gameService.deleteGame(gameId);
+        return noContent();
     }
 
 }

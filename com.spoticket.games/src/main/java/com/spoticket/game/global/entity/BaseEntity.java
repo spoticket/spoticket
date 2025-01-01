@@ -1,6 +1,5 @@
 package com.spoticket.game.global.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -17,15 +16,12 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
 
-    @Column(nullable = false)
     private boolean isDelete = false;
 
     @CreatedDate
-    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @CreatedBy
-    @Column(nullable = false, updatable = false)
     private String createdBy;
 
     @LastModifiedDate
@@ -37,5 +33,10 @@ public class BaseEntity {
     private LocalDateTime deletedAt;
 
     private String deletedBy;
+
+    public void delete() {
+        isDelete = true;
+        deletedAt = LocalDateTime.now();
+    }
 
 }

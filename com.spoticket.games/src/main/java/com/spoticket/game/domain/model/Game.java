@@ -1,5 +1,6 @@
 package com.spoticket.game.domain.model;
 
+import com.spoticket.game.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(name = "p_games")
 @Builder
-public class Game {
+public class Game extends BaseEntity {
 
     @Id
     @GeneratedValue(generator = "UUID")

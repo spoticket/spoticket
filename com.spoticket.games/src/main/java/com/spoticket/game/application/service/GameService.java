@@ -36,5 +36,12 @@ public class GameService {
         return GameResponse.from(game);
     }
 
+    @Transactional
+    public void deleteGame(UUID gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND));
+        game.delete();
+    }
+
 }
 
