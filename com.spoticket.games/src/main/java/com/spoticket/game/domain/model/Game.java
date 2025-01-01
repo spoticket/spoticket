@@ -1,11 +1,17 @@
 package com.spoticket.game.domain.model;
 
+import com.spoticket.game.dto.request.UpdateGameRequest;
 import com.spoticket.game.global.entity.BaseEntity;
+import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
+
+import static io.micrometer.common.util.StringUtils.*;
+import static java.util.Objects.*;
 
 @Entity
 @Getter
@@ -45,6 +51,17 @@ public class Game extends BaseEntity {
                 .homeTeamId(homeTeamId)
                 .awayTeamId(awayTeamId)
                 .build();
+    }
+
+    public void update(String title, LocalDateTime startTime, String league, Sport sport,
+                       UUID stadiumId, UUID homeTeamId, UUID awayTeamId) {
+        if (isNotBlank(title)) this.title = title;
+        if (nonNull(startTime)) this.startTime = startTime;
+        if (isNotBlank(league)) this.league = league;
+        if (nonNull(sport)) this.sport = sport;
+        if (nonNull(stadiumId)) this.stadiumId = stadiumId;
+        if (nonNull(homeTeamId)) this.homeTeamId = homeTeamId;
+        if (nonNull(awayTeamId)) this.awayTeamId = awayTeamId;
     }
 
 }

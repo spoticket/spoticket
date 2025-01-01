@@ -2,6 +2,7 @@ package com.spoticket.game.presentation.controller;
 
 import com.spoticket.game.application.service.GameService;
 import com.spoticket.game.dto.request.CreateGameRequest;
+import com.spoticket.game.dto.request.UpdateGameRequest;
 import com.spoticket.game.dto.response.GameResponse;
 import com.spoticket.game.global.exception.CustomException;
 import jakarta.validation.Valid;
@@ -40,6 +41,11 @@ public class GameController {
     @GetMapping
     public DataResponse<PagedModel<GameResponse>> getGamesByStadiumId(UUID stadiumId, Pageable pageable) {
         return ok(gameService.getGamesByStadiumId(stadiumId, pageable));
+    }
+
+    @PatchMapping("/{gameId}")
+    public DataResponse<GameResponse> updateGame(@PathVariable UUID gameId, @RequestBody UpdateGameRequest request) {
+        return ok(gameService.updateGame(gameId, request));
     }
 
     @DeleteMapping("/{gameId}")

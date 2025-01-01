@@ -3,6 +3,7 @@ package com.spoticket.game.application.service;
 import com.spoticket.game.domain.model.Game;
 import com.spoticket.game.domain.repository.GameRepository;
 import com.spoticket.game.dto.request.CreateGameRequest;
+import com.spoticket.game.dto.request.UpdateGameRequest;
 import com.spoticket.game.dto.response.GameResponse;
 import com.spoticket.game.dto.response.GenericPagedModel;
 import com.spoticket.game.global.exception.CustomException;
@@ -48,6 +49,22 @@ public class GameService {
     public GenericPagedModel<GameResponse> getGamesByStadiumId(UUID stadiumId, Pageable pageable) {
         Page<GameResponse> page = gameRepository.findAllByStadiumIdAndIsDeleteFalse(stadiumId, pageable);
         return GenericPagedModel.of(page);
+    }
+
+    @Transactional
+    public GameResponse updateGame(UUID gameId, UpdateGameRequest request) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new CustomException(NOT_FOUND));
+        game.update(
+                request.getTitle(),
+                request.getStartTime(),
+                request.getLeague(),
+                request.getSport(),
+                request.getStadiumId(),
+                request.getHomeTeamId(),
+                request.getAwayTeamId()
+        );
+        return GameResponse.from(game);
     }
 
 }
