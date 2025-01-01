@@ -4,9 +4,11 @@ import com.spoticket.game.domain.model.Game;
 import com.spoticket.game.domain.repository.GameRepository;
 import com.spoticket.game.dto.request.CreateGameRequest;
 import com.spoticket.game.dto.response.GameResponse;
+import com.spoticket.game.dto.response.GenericPagedModel;
 import com.spoticket.game.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +33,7 @@ public class GameService {
     }
 
     public GameResponse getGame(UUID gameId) throws CustomException {
-        Game game = gameRepository.findById(gameId)
+        Game game = gameRepository.findByGameIdAndIsDeleteFalse(gameId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND));
         return GameResponse.from(game);
     }
@@ -41,6 +43,11 @@ public class GameService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new CustomException(NOT_FOUND));
         game.delete();
+    }
+
+    public GenericPagedModel<GameResponse> getGamesByStadiumId(UUID stadiumId, Pageable pageable) {
+        Page<GameResponse> page = gameRepository.findAllByStadiumIdAndIsDeleteFalse(stadiumId, pageable);
+        return GenericPagedModel.of(page);
     }
 
 }
