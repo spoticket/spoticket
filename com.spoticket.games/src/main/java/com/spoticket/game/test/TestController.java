@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-import static com.spoticket.game.global.util.ResponseUtils.*;
-import static org.springframework.http.HttpStatus.*;
+import static com.spoticket.game.global.util.ResponseUtils.DataResponse;
+import static com.spoticket.game.global.util.ResponseUtils.ok;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestController
 @Slf4j
