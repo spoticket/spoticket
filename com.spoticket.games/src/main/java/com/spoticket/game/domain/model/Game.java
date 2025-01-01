@@ -1,17 +1,14 @@
 package com.spoticket.game.domain.model;
 
-import com.spoticket.game.dto.request.UpdateGameRequest;
 import com.spoticket.game.global.entity.BaseEntity;
-import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
-import static io.micrometer.common.util.StringUtils.*;
-import static java.util.Objects.*;
+import static io.micrometer.common.util.StringUtils.isNotBlank;
+import static java.util.Objects.nonNull;
 
 @Entity
 @Getter
