@@ -1,5 +1,6 @@
 package com.spoticket.ticket.domain.entity;
 
+import com.spoticket.ticket.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 @Getter
-public class Ticket {
+public class Ticket extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
