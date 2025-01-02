@@ -2,6 +2,9 @@ package com.spoticket.teamstadium.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -9,9 +12,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
+import com.spoticket.teamstadium.application.dto.response.TeamReadResponse;
 import com.spoticket.teamstadium.application.service.TeamService;
 import com.spoticket.teamstadium.domain.model.Team;
 import com.spoticket.teamstadium.domain.model.TeamCategoryEnum;
+import com.spoticket.teamstadium.domain.repository.FavTeamRepository;
 import com.spoticket.teamstadium.domain.repository.TeamRepository;
 import com.spoticket.teamstadium.exception.BusinessException;
 import com.spoticket.teamstadium.exception.ErrorCode;
@@ -32,6 +37,9 @@ class TeamServiceTest {
 
   @Mock
   private TeamRepository teamRepository;
+
+  @Mock
+  private FavTeamRepository favTeamRepository;
 
   @InjectMocks
   private TeamService teamService;
@@ -98,7 +106,7 @@ class TeamServiceTest {
 
     // Then
     assertThat(response).isNotNull();
-    assertThat(response.status()).isEqualTo(200);
+    assertThat(response.code()).isEqualTo(200);
     assertThat(response.msg()).isEqualTo("생성 완료");
     assertThat(response.data()).containsKey("teamId");
     assertThat(response.data()).containsEntry("teamId", teamId);
@@ -115,5 +123,35 @@ class TeamServiceTest {
 
     verify(teamRepository, times(1)).findByNameAndIsDeletedFalse(request.name());
     verify(teamRepository, times(1)).save(any(Team.class));
+  }
+
+  // 팀 단일 조회
+  @Test
+  void getTeamInfo_FeignClientIsExcluded() {
+    // Given
+    UUID teamId = UUID.randomUUID();
+    Team mockTeam = Team.builder()
+        .teamId(teamId)
+        .name("Test Team")
+        .description("test team")
+        .build();
+
+    long favCnt = 10;
+
+    when(teamRepository.findByTeamIdAndIsDeletedFalse(teamId)).thenReturn(Optional.of(mockTeam));
+    when(favTeamRepository.countByTeam_TeamId(teamId)).thenReturn(favCnt);
+
+    // When
+    ApiResponse<TeamReadResponse> response = teamService.getTeamInfo(teamId);
+
+    // Then
+    assertNotNull(response);
+    assertEquals(200, response.code());
+
+    TeamReadResponse teamReadResponse = response.data();
+    assertEquals(teamId, teamReadResponse.team().teamId());
+    assertEquals("Test Team", teamReadResponse.team().name());
+    assertEquals(favCnt, teamReadResponse.team().favCnt());
+    assertNull(teamReadResponse.games());
   }
 }
