@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 import org.locationtech.jts.geom.Point;
 
@@ -23,7 +22,6 @@ import org.locationtech.jts.geom.Point;
 @AllArgsConstructor
 @Builder
 @Getter
-@Setter
 public class Stadium extends BaseEntity {
 
   @Id
