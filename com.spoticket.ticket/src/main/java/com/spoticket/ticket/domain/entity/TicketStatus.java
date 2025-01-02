@@ -1,6 +1,6 @@
 package com.spoticket.ticket.domain.entity;
 
-public enum Status {
+public enum TicketStatus {
 
   PICKED,
   BOOKED,
