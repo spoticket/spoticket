@@ -1,5 +1,9 @@
 package com.spoticket.game.domain.model;
 
+import static io.micrometer.common.util.StringUtils.isNotBlank;
+import static java.util.Objects.nonNull;
+
+import com.spoticket.game.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +24,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "p_games")
 @Builder
-public class Game {
+public class Game extends BaseEntity {
 
   @Id
   @GeneratedValue(generator = "UUID")
@@ -52,6 +56,30 @@ public class Game {
         .homeTeamId(homeTeamId)
         .awayTeamId(awayTeamId)
         .build();
+  }
+
+  public void update(String title, LocalDateTime startTime, String league, Sport sport,
+      UUID stadiumId, UUID homeTeamId, UUID awayTeamId) {
+      if (isNotBlank(title)) {
+          this.title = title;
+      }
+      if (nonNull(startTime)) {
+          this.startTime = startTime;
+      }
+      if (isNotBlank(league)) {
+          this.league = league;
+      }
+      if (nonNull(sport)) {
+          this.sport = sport;
+      }
+      if (nonNull(stadiumId)) {
+          this.stadiumId = stadiumId;
+      }
+      if (nonNull(homeTeamId)) {
+          this.homeTeamId = homeTeamId;
+      }
+    if (nonNull(awayTeamId))
+      this.awayTeamId = awayTeamId;
   }
 
 }
