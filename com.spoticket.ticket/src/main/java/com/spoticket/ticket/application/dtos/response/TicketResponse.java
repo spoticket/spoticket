@@ -1,8 +1,11 @@
 package com.spoticket.ticket.application.dtos.response;
 
+import com.spoticket.ticket.domain.entity.Ticket;
 import com.spoticket.ticket.domain.entity.TicketStatus;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record TicketResponse(
     UUID ticketId,
     UUID userId,
@@ -12,4 +15,14 @@ public record TicketResponse(
     TicketStatus status
 ) {
 
+  public static TicketResponse from(Ticket ticket) {
+    return TicketResponse.builder()
+        .ticketId(ticket.getTicketId())
+        .userId(ticket.getUserId())
+        .gameId(ticket.getGameId())
+        .seatId(ticket.getSeatId())
+        .seatName(ticket.getSeatName())
+        .status(ticket.getStatus())
+        .build();
+  }
 }

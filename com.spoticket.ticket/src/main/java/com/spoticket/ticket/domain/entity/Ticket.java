@@ -35,6 +35,16 @@ public class Ticket {
   private String seatName;
 
   @Enumerated(value = EnumType.STRING)
-  private Status status;
+  private TicketStatus status;
+
+  public static Ticket create(UUID userId, UUID gameId, UUID seatId, String seatName) {
+    return Ticket.builder()
+        .userId(userId)
+        .gameId(gameId)
+        .seatId(seatId)
+        .seatName(seatName)
+        .status(TicketStatus.PICKED)
+        .build();
+  }
 
 }
