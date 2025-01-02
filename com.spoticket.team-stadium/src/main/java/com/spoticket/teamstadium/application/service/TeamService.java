@@ -3,6 +3,8 @@ package com.spoticket.teamstadium.application.service;
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
 import com.spoticket.teamstadium.domain.model.Team;
 import com.spoticket.teamstadium.domain.repository.TeamRepository;
+import com.spoticket.teamstadium.exception.BusinessException;
+import com.spoticket.teamstadium.exception.ErrorCode;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import java.util.Map;
 import java.util.UUID;
@@ -22,7 +24,7 @@ public class TeamService {
 
     // 팀명 중복 체크
     if (teamRepository.findByName(request.name()).isPresent()) {
-      return new ApiResponse<>(400, "중복된 팀명입니다", null);
+      throw new BusinessException(ErrorCode.DUPLICATE_TEAM_NAME);
     }
 
     Team team = Team.create(
