@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum ErrorCode {
 
   DUPLICATE_TEAM_NAME(400, "중복된 팀명입니다"),
+  TEAM_NOT_FOUND(404, "해당하는 팀이 없습니다"),
   NOT_FOUND(404, "요청한 리소스를 찾을 수 없습니다"),
   SERVER_ERROR(500, "서버 에러가 발생했습니다");
 

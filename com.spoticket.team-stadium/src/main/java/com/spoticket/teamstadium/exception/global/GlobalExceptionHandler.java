@@ -1,5 +1,7 @@
-package com.spoticket.teamstadium.exception;
+package com.spoticket.teamstadium.exception.global;
 
+import com.spoticket.teamstadium.exception.BusinessException;
+import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.global.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +28,18 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 
-  // JSON 데이터를 직렬화/역직렬화시 문제 발생
+  // JSON 직렬화/역직렬화시 문제 발생
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
       HttpMessageNotReadableException ex) {
     ErrorResponse errorResponse = new ErrorResponse(400, "요청값이 유효하지 않습니다");
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(NotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
+    ErrorResponse errorResponse = new ErrorResponse(ex.getCode(), ex.getMessage());
+    return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(ex.getCode()));
   }
 
   // 서버에서 발생하는 기타 예외 처리
