@@ -12,11 +12,11 @@ public record TeamInfoResponse(
     String profile,
     String homeLink,
     String snsLink,
-    Integer favCnt,
+    long favCnt,
     Boolean isFavorite
 ) {
 
-  public static TeamInfoResponse from(Team team, Integer favCnt, boolean isFav) {
+  public static TeamInfoResponse from(Team team, long favCnt, boolean isFav) {
     return new TeamInfoResponse(
         team.getTeamId(),
         team.getName(),

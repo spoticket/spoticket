@@ -52,14 +52,15 @@ class TeamServiceTest {
         "https://sns.com"
     );
 
-    when(teamRepository.findByName(teamName)).thenReturn(Optional.of(mock(Team.class)));
+    when(teamRepository.findByNameAndIsDeletedFalse(teamName)).thenReturn(
+        Optional.of(mock(Team.class)));
 
     // When & Then
     assertThatThrownBy(() -> teamService.createTeam(request))
         .isInstanceOf(BusinessException.class)
         .hasMessage(ErrorCode.DUPLICATE_TEAM_NAME.getMessage());
 
-    verify(teamRepository, times(1)).findByName(teamName);
+    verify(teamRepository, times(1)).findByNameAndIsDeletedFalse(teamName);
 
   }
 
@@ -87,7 +88,7 @@ class TeamServiceTest {
         "https://sns.com"
     );
 
-    when(teamRepository.findByName(request.name())).thenReturn(Optional.empty());
+    when(teamRepository.findByNameAndIsDeletedFalse(request.name())).thenReturn(Optional.empty());
     when(teamRepository.save(any(Team.class))).thenReturn(mockTeam);
 
     ArgumentCaptor<Team> teamCaptor = ArgumentCaptor.forClass(Team.class);
@@ -112,7 +113,7 @@ class TeamServiceTest {
     assertThat(savedTeam.getHomeLink()).isEqualTo(request.homeLink());
     assertThat(savedTeam.getSnsLink()).isEqualTo(request.snsLink());
 
-    verify(teamRepository, times(1)).findByName(request.name());
+    verify(teamRepository, times(1)).findByNameAndIsDeletedFalse(request.name());
     verify(teamRepository, times(1)).save(any(Team.class));
   }
 }
