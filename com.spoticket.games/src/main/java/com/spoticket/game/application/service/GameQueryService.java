@@ -22,13 +22,13 @@ public class GameQueryService {
   private final GameRepository gameRepository;
 
   public GameResponse getGame(UUID gameId) {
-    Game game = gameRepository.findByGameIdAndIsDeleteFalse(gameId)
+    Game game = gameRepository.findByGameIdAndIsDeletedFalse(gameId)
         .orElseThrow(() -> new CustomException(NOT_FOUND));
     return GameResponse.from(game);
   }
 
   public GenericPagedModel<GameResponse> getGamesByStadiumId(UUID stadiumId, Pageable pageable) {
-    Page<GameResponse> page = gameRepository.findAllByStadiumIdAndIsDeleteFalse(stadiumId,
+    Page<GameResponse> page = gameRepository.findAllByStadiumIdAndIsDeletedFalse(stadiumId,
         pageable);
     return GenericPagedModel.of(page);
   }

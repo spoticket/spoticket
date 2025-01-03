@@ -41,7 +41,7 @@ class GameQueryServiceTest {
   @Test
   void getGame_success() {
     // given
-    when(gameRepository.findByGameIdAndIsDeleteFalse(any(UUID.class))).thenReturn(
+    when(gameRepository.findByGameIdAndIsDeletedFalse(any(UUID.class))).thenReturn(
         Optional.of(game));
 
     // when
@@ -75,7 +75,8 @@ class GameQueryServiceTest {
   @Test
   void getGame_notFound() {
     // given
-    when(gameRepository.findByGameIdAndIsDeleteFalse(any(UUID.class))).thenReturn(Optional.empty());
+    when(gameRepository.findByGameIdAndIsDeletedFalse(any(UUID.class))).thenReturn(
+        Optional.empty());
 
     // when & then
     assertThatThrownBy(() -> gameQueryService.getGame(UUID.randomUUID()))
