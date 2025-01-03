@@ -3,6 +3,7 @@ package com.spoticket.teamstadium.application.service;
 import com.spoticket.teamstadium.application.dto.request.StadiumCreateRequest;
 import com.spoticket.teamstadium.application.dto.response.GameReadResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumInfoResponse;
+import com.spoticket.teamstadium.application.dto.response.StadiumListReadResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumReadResponse;
 import com.spoticket.teamstadium.domain.model.Stadium;
 import com.spoticket.teamstadium.domain.repository.StadiumRepository;
@@ -10,6 +11,7 @@ import com.spoticket.teamstadium.exception.BusinessException;
 import com.spoticket.teamstadium.exception.ErrorCode;
 import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
+import com.spoticket.teamstadium.global.dto.PaginatedResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,6 +63,15 @@ public class StadiumService {
     List<GameReadResponse> games = null;
     StadiumReadResponse response = new StadiumReadResponse(stadiumInfo, games);
     return new ApiResponse<>(200, "조회 완료", response);
+  }
+
+  // 경기장 목록 조회
+  public PaginatedResponse<StadiumListReadResponse> getStadiums(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<Stadium> stadiums = stadiumRepository.findAllByIsDeletedFalse(pageable);
+
+    Page<StadiumListReadResponse> response = stadiums.map(StadiumListReadResponse::from);
+    return PaginatedResponse.of(response);
   }
 
   public Stadium getStadiumById(UUID stadiumId) {

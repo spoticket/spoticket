@@ -3,6 +3,8 @@ package com.spoticket.teamstadium.domain.repository;
 import com.spoticket.teamstadium.domain.model.Stadium;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface StadiumRepository {
 
@@ -11,4 +13,6 @@ public interface StadiumRepository {
   Stadium save(Stadium stadium);
 
   Optional<Stadium> findByStadiumIdAndIsDeletedFalse(UUID stadiumId);
+
+  Page<Stadium> findAllByIsDeletedFalse(Pageable pageable);
 }

@@ -1,9 +1,11 @@
 package com.spoticket.teamstadium.presentation;
 
 import com.spoticket.teamstadium.application.dto.request.StadiumCreateRequest;
+import com.spoticket.teamstadium.application.dto.response.StadiumListReadResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumReadResponse;
 import com.spoticket.teamstadium.application.service.StadiumService;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
+import com.spoticket.teamstadium.global.dto.PaginatedResponse;
 import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,6 +39,17 @@ public class StadiumController {
       @PathVariable UUID stadiumId
   ) {
     return stadiumService.getStadiumInfo(stadiumId);
+  }
+
+  // 경기장 목록 조회
+  @GetMapping
+  public ApiResponse<PaginatedResponse<StadiumListReadResponse>> getStadiums(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+    PaginatedResponse<StadiumListReadResponse> response = stadiumService
+        .getStadiums(page, size);
+    return new ApiResponse<>(200, "조회 완료", response);
   }
 
 
