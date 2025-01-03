@@ -46,6 +46,7 @@ public class Stadium extends BaseEntity {
   private String description;
 
   @OneToMany(mappedBy = "stadium", fetch = FetchType.LAZY)
+  @Builder.Default
   private List<Seat> seats = new ArrayList<>();
 
   public static Stadium create(

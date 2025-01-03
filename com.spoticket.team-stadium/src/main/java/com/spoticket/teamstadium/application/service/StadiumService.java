@@ -38,9 +38,9 @@ public class StadiumService {
         request.description()
     );
 
-    stadiumRepository.save(stadium);
+    Stadium savedStadium = stadiumRepository.save(stadium);
 
-    Map<String, UUID> response = Map.of("stadiumId", stadium.getStadiumId());
+    Map<String, UUID> response = Map.of("stadiumId", savedStadium.getStadiumId());
     return new ApiResponse<>(200, "등록 완료", response);
   }
 }
