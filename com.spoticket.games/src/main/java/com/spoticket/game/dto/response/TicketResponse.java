@@ -1,6 +1,5 @@
 package com.spoticket.game.dto.response;
 
-import com.spoticket.game.temp.TicketStatus;
 import java.util.UUID;
 
 public record TicketResponse(
@@ -11,7 +10,7 @@ public record TicketResponse(
     UUID seatId,
     String seatName,
     TicketStatus status
-    
+
 ) {
 
 }
