@@ -1,6 +1,7 @@
 package com.spoticket.teamstadium.application.service;
 
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
+import com.spoticket.teamstadium.application.dto.request.TeamUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.GameReadResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamInfoResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamListReadResponse;
@@ -98,6 +99,29 @@ public class TeamService {
     return PaginatedResponse.of(response);
   }
 
+  // 팀 정보 수정
+  public ApiResponse<TeamUpdateRequest> updateTeam(
+      UUID teamId,
+      TeamUpdateRequest request
+  ) {
+    // 요청자 권한 체크 필요
+
+    Team team = getTeamById(teamId);
+    if (request.name() != null &&
+        teamRepository.findByNameAndIsDeletedFalse(request.name())
+            .filter(existingTeam -> !existingTeam.getTeamId().equals(teamId))
+            .isPresent()) {
+      throw new BusinessException(ErrorCode.DUPLICATE_TEAM_NAME);
+    }
+    team.update(
+        request.name(), request.description(),
+        request.profile(), request.homeLink(),
+        request.snsLink()
+    );
+    teamRepository.save(team);
+    return new ApiResponse<>(200, "수정 완료", null);
+  }
+
   public Team getTeamById(UUID teamId) {
     return teamRepository.findByTeamIdAndIsDeletedFalse(teamId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
@@ -113,6 +137,5 @@ public class TeamService {
     }
     return teamRepository.findAllByTeamIdInAndIsDeletedFalse(teamIds, pageable);
   }
-
 
 }
