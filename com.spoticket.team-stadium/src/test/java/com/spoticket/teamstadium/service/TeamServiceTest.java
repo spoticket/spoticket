@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -331,5 +332,26 @@ class TeamServiceTest {
     verify(teamRepository, never()).save(any());
   }
 
+  // 팀 삭제
+  @Test
+  void deleteTeam_success() {
+    // Given
+    UUID teamId = UUID.randomUUID();
+    Team mockTeam = Team.builder()
+        .teamId(UUID.randomUUID())
+        .name("Test Soccer Team")
+        .category(TeamCategoryEnum.SOCCER)
+        .build();
+    when(teamRepository.findByTeamIdAndIsDeletedFalse(teamId)).thenReturn(Optional.of(mockTeam));
 
+    // When
+    ApiResponse<Void> response = teamService.deleteTeam(teamId);
+
+    // Then
+    assertNotNull(response);
+    assertEquals(200, response.code());
+    assertEquals("삭제 완료", response.msg());
+    assertTrue(mockTeam.isDeleted());
+    verify(teamRepository, times(1)).save(mockTeam);
+  }
 }
