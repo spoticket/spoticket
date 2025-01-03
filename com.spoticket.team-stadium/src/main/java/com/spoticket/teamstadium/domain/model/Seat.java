@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
-@Entity(name = "P_SEATS")
+@Entity(name = "p_seats")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

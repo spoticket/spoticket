@@ -6,6 +6,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,13 +19,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public abstract class BaseEntity {
 
   @Column(name = "created_by", nullable = false, length = 100)
-  private String createdBy;
+  private UUID createdBy;
 
   @Column(name = "updated_by", length = 100)
-  private String updatedBy;
+  private UUID updatedBy;
 
   @Column(name = "deleted_by", length = 100)
-  private String deletedBy;
+  private UUID deletedBy;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
@@ -45,21 +46,21 @@ public abstract class BaseEntity {
   @PrePersist
   public void createBase() {
     this.createdAt = LocalDateTime.now();
-    this.createdBy = "temp_username"; // 임시데이터
+    this.createdBy = UUID.randomUUID(); // 임시데이터
   }
 
   // 수정
   @PreUpdate
   public void updateBase() {
     this.updatedAt = LocalDateTime.now();
-    this.updatedBy = "temp_username"; // 임시데이터
+    this.updatedBy = UUID.randomUUID(); // 임시데이터
   }
 
   // 삭제
-  public void deleteBase(String username) {
+  public void deleteBase() {
     this.isDeleted = true;
     this.deletedAt = LocalDateTime.now();
-    this.deletedBy = username;
+    this.deletedBy = UUID.randomUUID(); // 임시데이터
   }
 
 }

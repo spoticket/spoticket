@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
-@Entity(name = "P_FAV_TEAMS")
+@Entity(name = "p_fav_teams")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

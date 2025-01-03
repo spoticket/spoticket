@@ -11,7 +11,7 @@ public interface FavTeamRepository {
 
   long countByTeam_TeamId(UUID teamId);
 
-  @Query("SELECT f FROM P_FAV_TEAMS f WHERE f.userId = :userId")
+  @Query("SELECT f FROM p_fav_teams f WHERE f.userId = :userId")
   Page<FavTeam> findAllByUserId(
       @Param("userId") UUID userId, Pageable pageable);
 
