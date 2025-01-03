@@ -12,7 +12,6 @@ import com.spoticket.game.application.service.GameQueryService;
 import com.spoticket.game.dto.request.CreateGameRequest;
 import com.spoticket.game.dto.request.UpdateGameRequest;
 import com.spoticket.game.dto.response.GameResponse;
-import com.spoticket.game.global.exception.CustomException;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,7 @@ public class GameController {
   public DataResponse<GameResponse> createGame(
       @Valid @RequestBody CreateGameRequest request,
       BindingResult result
-  ) throws CustomException {
+  ) {
     validateAndThrowIfInvalid(result);
     return created(gameCommandService.createGame(request));
   }
