@@ -1,11 +1,16 @@
 package com.spoticket.teamstadium.application.service;
 
 import com.spoticket.teamstadium.application.dto.request.StadiumCreateRequest;
+import com.spoticket.teamstadium.application.dto.response.GameReadResponse;
+import com.spoticket.teamstadium.application.dto.response.StadiumInfoResponse;
+import com.spoticket.teamstadium.application.dto.response.StadiumReadResponse;
 import com.spoticket.teamstadium.domain.model.Stadium;
 import com.spoticket.teamstadium.domain.repository.StadiumRepository;
 import com.spoticket.teamstadium.exception.BusinessException;
 import com.spoticket.teamstadium.exception.ErrorCode;
+import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +47,22 @@ public class StadiumService {
 
     Map<String, UUID> response = Map.of("stadiumId", savedStadium.getStadiumId());
     return new ApiResponse<>(200, "등록 완료", response);
+  }
+
+  // 경기장 단일 조회
+  public ApiResponse<StadiumReadResponse> getStadiumInfo(UUID stadiumId) {
+
+    Stadium stadium = getStadiumById(stadiumId);
+    StadiumInfoResponse stadiumInfo = StadiumInfoResponse.from(stadium);
+    // 경기장 관련 게임 정보 조회 메서드 호출 필요
+    List<GameReadResponse> games = null;
+    StadiumReadResponse response = new StadiumReadResponse(stadiumInfo, games);
+    return new ApiResponse<>(200, "조회 완료", response);
+  }
+
+  public Stadium getStadiumById(UUID stadiumId) {
+    return stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.STADIUM_NOT_FOUND));
+
   }
 }
