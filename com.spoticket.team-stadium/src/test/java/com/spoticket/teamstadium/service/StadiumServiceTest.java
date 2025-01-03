@@ -1,5 +1,6 @@
 package com.spoticket.teamstadium.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,11 +11,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.spoticket.teamstadium.application.dto.request.StadiumCreateRequest;
+import com.spoticket.teamstadium.application.dto.response.StadiumReadResponse;
 import com.spoticket.teamstadium.application.service.StadiumService;
 import com.spoticket.teamstadium.domain.model.Stadium;
 import com.spoticket.teamstadium.domain.repository.StadiumRepository;
 import com.spoticket.teamstadium.exception.BusinessException;
 import com.spoticket.teamstadium.exception.ErrorCode;
+import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.factory.StadiumTestFactory;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import java.util.Map;
@@ -108,6 +111,86 @@ class StadiumServiceTest {
     assertEquals("등록 완료", response.msg());
     assertNotNull(response.data().get("stadiumId"));
     assertEquals(stadiumId, response.data().get("stadiumId"));
+  }
+
+  // 경기장 단일 조회
+  @Test
+  void getStadiumInfo_FeignClientIsExcluded() {
+    // Given
+    UUID stadiumId = UUID.randomUUID();
+    Point latLng = new GeometryFactory().createPoint(new Coordinate(12.345, 67.89));
+    Stadium mockStadium = Stadium.builder()
+        .stadiumId(stadiumId)
+        .name("test stadium")
+        .address("test address")
+        .latLng(latLng)
+        .seatImage("http://sampleImage.com")
+        .description("test description")
+        .build();
+
+    when(stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId)).thenReturn(
+        Optional.of(mockStadium));
+
+    // When
+    ApiResponse<StadiumReadResponse> response = stadiumService.getStadiumInfo(stadiumId);
+
+    // Then
+    assertNotNull(response);
+    assertEquals(200, response.code());
+
+    StadiumReadResponse res = response.data();
+    assertEquals(stadiumId, res.stadium().stadiumId());
+    assertEquals("test stadium", res.stadium().name());
+    assertEquals("test address", res.stadium().address());
+  }
+
+  // 팀 목록 조회
+  @Test
+  void testGetStadiumInfo_Success() {
+    // Given
+    UUID stadiumId = UUID.randomUUID();
+    Stadium stadium = StadiumTestFactory.createWithId(
+        stadiumId,
+        "test stadium",
+        "sample address",
+        new GeometryFactory().createPoint(new Coordinate(45.678, 12.345)),
+        "https://seatImage.sample.com",
+        "sample description"
+    );
+
+    when(stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId))
+        .thenReturn(Optional.of(stadium));
+
+    // When
+    ApiResponse<StadiumReadResponse> response = stadiumService.getStadiumInfo(stadiumId);
+
+    // Then
+    verify(stadiumRepository, times(1)).findByStadiumIdAndIsDeletedFalse(stadiumId);
+
+    assertThat(response).isNotNull();
+    assertThat(response.code()).isEqualTo(200);
+    assertThat(response.msg()).isEqualTo("조회 완료");
+
+    StadiumReadResponse stadiumReadResponse = response.data();
+    assertThat(stadiumReadResponse).isNotNull();
+    assertThat(stadiumReadResponse.stadium().name()).isEqualTo("test stadium");
+    assertThat(stadiumReadResponse.stadium().address()).isEqualTo("sample address");
+  }
+
+  @Test
+  void testGetStadiumInfo_WhenStadiumDoesNotExist() {
+    // Given
+    UUID stadiumId = UUID.randomUUID();
+
+    when(stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId))
+        .thenReturn(Optional.empty());
+
+    // When & Then
+    assertThatThrownBy(() -> stadiumService.getStadiumInfo(stadiumId))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessage(ErrorCode.STADIUM_NOT_FOUND.getMessage());
+
+    verify(stadiumRepository, times(1)).findByStadiumIdAndIsDeletedFalse(stadiumId);
   }
 }
 
