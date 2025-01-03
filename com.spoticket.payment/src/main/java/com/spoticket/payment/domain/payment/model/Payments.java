@@ -17,7 +17,7 @@ import java.util.UUID;
 @Table(name = "p_payments", schema = "payment_service")
 public class Payments {
 
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "payment_id")
     private UUID paymentId;
 
