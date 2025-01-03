@@ -40,10 +40,10 @@ public class User extends BaseEntity {
 
     private Integer post;
 
-    private String addressRode;
+    private String address;
     private String addressDetail;
 
-    public static User of(String email, String password, String slackId, String name, String gender, Date birthday, Integer post, String addressRode, String addressDetail) {
+    public static User of(String email, String password, String slackId, String name, String gender, Date birthday, Integer post, String address, String addressDetail) {
         return User.builder()
                 .email(email)
                 .password(password)
@@ -53,12 +53,12 @@ public class User extends BaseEntity {
                 .gender(gender)
                 .birthday(birthday)
                 .post(post)
-                .addressRode(addressRode)
+                .address(address)
                 .addressDetail(addressDetail)
                 .build();
     }
 
-    public void update(String email, String password, String slackId, String name, String gender, Date birthday, Integer post, String addressRode, String addressDetail) {
+    public void update(String email, String password, String slackId, String name, String gender, Date birthday, Integer post, String address, String addressDetail) {
         if (isNotBlank(email)) this.email = email;
         if (isNotBlank(password)) this.password = password;
         if (isNotBlank(slackId)) this.slackId = slackId;
@@ -66,7 +66,7 @@ public class User extends BaseEntity {
         if (isNotBlank(gender)) this.gender = gender;
         if (nonNull(birthday)) this.birthday = birthday;
         if (nonNull(post)) this.post = post;
-        if (isNotBlank(addressRode)) this.addressRode = addressRode;
+        if (isNotBlank(address)) this.address = address;
         if (isNotBlank(addressDetail)) this.addressDetail = addressDetail;
     }
 
