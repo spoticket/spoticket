@@ -5,11 +5,19 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import static jakarta.persistence.CascadeType.PERSIST;
 
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
-@Table(name = "P_ORDER", schema = "payment_service")
+@Table(name = "P_ORDERS", schema = "payment_service")
 public class Order {
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID orderId;
