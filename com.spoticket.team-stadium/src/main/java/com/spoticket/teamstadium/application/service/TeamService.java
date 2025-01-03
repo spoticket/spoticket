@@ -122,6 +122,16 @@ public class TeamService {
     return new ApiResponse<>(200, "수정 완료", null);
   }
 
+  // 팀 정보 삭제
+  public ApiResponse<Void> deleteTeam(UUID teamId) {
+    // 요청자 권한 체크 필요
+
+    Team team = getTeamById(teamId);
+    team.deleteBase();
+    teamRepository.save(team);
+    return new ApiResponse<>(200, "삭제 완료", null);
+  }
+
   public Team getTeamById(UUID teamId) {
     return teamRepository.findByTeamIdAndIsDeletedFalse(teamId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
@@ -137,5 +147,6 @@ public class TeamService {
     }
     return teamRepository.findAllByTeamIdInAndIsDeletedFalse(teamIds, pageable);
   }
+
 
 }

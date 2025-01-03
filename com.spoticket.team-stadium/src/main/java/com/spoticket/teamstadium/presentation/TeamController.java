@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,5 +67,13 @@ public class TeamController {
       @Valid @RequestBody TeamUpdateRequest request
   ) {
     return teamService.updateTeam(teamId, request);
+  }
+
+  // 팀 정보 삭제
+  @DeleteMapping("/{teamId}")
+  public ApiResponse<Void> deleteTeam(
+      @PathVariable UUID teamId
+  ) {
+    return teamService.deleteTeam(teamId);
   }
 }
