@@ -131,8 +131,13 @@ public class TeamService {
     // 요청자 권한 체크 필요
 
     Team team = getTeamById(teamId);
+
+    List<FavTeam> favTeams = favTeamRepository.findAllByTeamId(teamId);
+    favTeamRepository.deleteAll(favTeams);
+
     team.deleteBase();
     teamRepository.save(team);
+
     return new ApiResponse<>(200, "삭제 완료", null);
   }
 
