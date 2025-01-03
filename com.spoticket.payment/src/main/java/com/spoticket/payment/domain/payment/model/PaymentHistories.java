@@ -4,6 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import jakarta.persistence.Table;
@@ -14,12 +16,15 @@ import java.util.UUID;
 @Table(name = "P_payment_histories", schema = "payment_service")
 public class PaymentHistories {
 
-    @Id
+    @Id  @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "histories_id")
     private UUID historiesId;
 
     @Column(name = "payment_id", nullable = false)
     private UUID paymentId;
+
+    @Column(nullable = false)
+    private long amount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
