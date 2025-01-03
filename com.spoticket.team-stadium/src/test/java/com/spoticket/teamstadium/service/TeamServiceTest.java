@@ -9,11 +9,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
+import com.spoticket.teamstadium.application.dto.request.TeamUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.TeamListReadResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamReadResponse;
 import com.spoticket.teamstadium.application.service.TeamService;
@@ -24,6 +26,7 @@ import com.spoticket.teamstadium.domain.repository.FavTeamRepository;
 import com.spoticket.teamstadium.domain.repository.TeamRepository;
 import com.spoticket.teamstadium.exception.BusinessException;
 import com.spoticket.teamstadium.exception.ErrorCode;
+import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.factory.TeamTestFactory;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
@@ -269,5 +272,64 @@ class TeamServiceTest {
 
     verify(teamRepository, times(1)).findAllByIsDeletedFalse(pageable);
   }
+
+  // 팀 수정
+  @Test
+  void updateTeam_success() {
+    // Given
+    UUID teamId = UUID.randomUUID();
+    Team existingTeam = Team.builder()
+        .teamId(teamId)
+        .name("Old Team Name")
+        .description("Old Description")
+        .build();
+
+    TeamUpdateRequest updateRequest = new TeamUpdateRequest(
+        "New Team Name",
+        "New Description",
+        "New Profile",
+        "New HomeLink",
+        "New SNSLink"
+    );
+
+    when(teamRepository.findByTeamIdAndIsDeletedFalse(teamId)).thenReturn(
+        Optional.of(existingTeam));
+    when(teamRepository.findByNameAndIsDeletedFalse(updateRequest.name()))
+        .thenReturn(Optional.empty());
+
+    // When
+    ApiResponse<TeamUpdateRequest> response = teamService.updateTeam(teamId, updateRequest);
+
+    // Then
+    assertEquals(200, response.code());
+    assertEquals("수정 완료", response.msg());
+
+    assertEquals("New Team Name", existingTeam.getName());
+    assertEquals("New Description", existingTeam.getDescription());
+    verify(teamRepository).save(existingTeam);
+  }
+
+  @Test
+  void updateTeam_WhenTeamDoesNotExist() {
+    // Given
+    UUID teamId = UUID.randomUUID();
+    TeamUpdateRequest updateRequest = new TeamUpdateRequest(
+        "New Team Name",
+        "New Description",
+        "New Profile",
+        "New HomeLink",
+        "New SNSLink"
+    );
+
+    when(teamRepository.findByTeamIdAndIsDeletedFalse(teamId)).thenReturn(Optional.empty());
+
+    // When, Then
+    assertThatThrownBy(() -> teamService.updateTeam(teamId, updateRequest))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessage("해당하는 팀이 없습니다");
+
+    verify(teamRepository, never()).save(any());
+  }
+
 
 }
