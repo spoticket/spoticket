@@ -354,4 +354,69 @@ class TeamServiceTest {
     assertTrue(mockTeam.isDeleted());
     verify(teamRepository, times(1)).save(mockTeam);
   }
+
+  // 관심 팀
+  @Test
+  void FavTeam_Add() {
+    // Given
+    UUID teamId = UUID.fromString("fc3514a1-c4c9-4c07-ab62-f99719797712");
+    UUID userId = UUID.fromString("6844ee91-b725-4606-b06a-df7c7a58e452");
+
+    Team mockTeam = Team.builder()
+        .teamId(teamId)
+        .name("Test Team")
+        .build();
+
+    when(teamRepository.findByTeamIdAndIsDeletedFalse(teamId)).thenReturn(Optional.of(mockTeam));
+    when(favTeamRepository.findByUserIdAndTeam_TeamId(userId, teamId)).thenReturn(Optional.empty());
+
+    ArgumentCaptor<FavTeam> favTeam = ArgumentCaptor.forClass(FavTeam.class);
+
+    // When
+    ApiResponse<Void> response = teamService.favTeam(teamId);
+
+    // Then
+    assertNotNull(response);
+    assertEquals(200, response.code());
+    assertEquals("관심 팀에 추가되었습니다", response.msg());
+
+    verify(favTeamRepository).save(favTeam.capture());
+    FavTeam savedFavTeam = favTeam.getValue();
+
+    assertEquals(userId, savedFavTeam.getUserId());
+    assertEquals(mockTeam, savedFavTeam.getTeam());
+  }
+
+  @Test
+  void FavTeam_Remove() {
+    // Given
+    UUID teamId = UUID.fromString("fc3514a1-c4c9-4c07-ab62-f99719797712");
+    UUID userId = UUID.fromString("6844ee91-b725-4606-b06a-df7c7a58e452");
+
+    Team mockTeam = Team.builder()
+        .teamId(teamId)
+        .name("Test Team")
+        .build();
+
+    FavTeam mockFavTeam = FavTeam.builder()
+        .favId(UUID.randomUUID())
+        .userId(userId)
+        .team(mockTeam)
+        .build();
+
+    when(teamRepository.findByTeamIdAndIsDeletedFalse(teamId)).thenReturn(Optional.of(mockTeam));
+    when(favTeamRepository.findByUserIdAndTeam_TeamId(userId, teamId)).thenReturn(
+        Optional.of(mockFavTeam));
+
+    // When
+    ApiResponse<Void> response = teamService.favTeam(teamId);
+
+    // Then
+    assertNotNull(response);
+    assertEquals(200, response.code());
+    assertEquals("관심 팀에서 삭제되었습니다", response.msg());
+
+    verify(favTeamRepository).delete(mockFavTeam);
+  }
+
 }

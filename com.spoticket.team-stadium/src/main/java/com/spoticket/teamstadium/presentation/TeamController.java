@@ -54,7 +54,7 @@ public class TeamController {
       @RequestParam(defaultValue = "10") int size
 //      @RequestHeader(name = "userId", required = false) UUID userId
   ) {
-    UUID userId = UUID.randomUUID(); // 임시값
+    UUID userId = UUID.fromString("6844ee91-b725-4606-b06a-df7c7a58e452"); // 임시값
     PaginatedResponse<TeamListReadResponse> response = teamService
         .getTeams(category, fav, userId, page, size);
     return new ApiResponse<>(200, "조회 완료", response);
@@ -75,5 +75,13 @@ public class TeamController {
       @PathVariable UUID teamId
   ) {
     return teamService.deleteTeam(teamId);
+  }
+
+  // 관심 팀 추가/삭제
+  @GetMapping("/fav/{teamId}")
+  public ApiResponse<Void> favTeam(
+      @PathVariable UUID teamId
+  ) {
+    return teamService.favTeam(teamId);
   }
 }

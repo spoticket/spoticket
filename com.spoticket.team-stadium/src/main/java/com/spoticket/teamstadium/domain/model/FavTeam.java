@@ -33,4 +33,13 @@ public class FavTeam {
   @Column(nullable = false)
   private UUID userId;
 
+  public static FavTeam create(
+      UUID userId,
+      Team team
+  ) {
+    return FavTeam.builder()
+        .userId(userId)
+        .team(team)
+        .build();
+  }
 }
