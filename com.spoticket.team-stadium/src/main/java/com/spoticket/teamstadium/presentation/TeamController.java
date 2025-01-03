@@ -1,6 +1,7 @@
 package com.spoticket.teamstadium.presentation;
 
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
+import com.spoticket.teamstadium.application.dto.request.TeamUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.TeamListReadResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamReadResponse;
 import com.spoticket.teamstadium.application.service.TeamService;
@@ -11,7 +12,9 @@ import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,9 +54,34 @@ public class TeamController {
       @RequestParam(defaultValue = "10") int size
 //      @RequestHeader(name = "userId", required = false) UUID userId
   ) {
-    UUID userId = UUID.randomUUID(); // 임시값
+    UUID userId = UUID.fromString("6844ee91-b725-4606-b06a-df7c7a58e452"); // 임시값
     PaginatedResponse<TeamListReadResponse> response = teamService
         .getTeams(category, fav, userId, page, size);
     return new ApiResponse<>(200, "조회 완료", response);
+  }
+
+  // 팀 정보 수정
+  @PatchMapping("/{teamId}")
+  public ApiResponse<TeamUpdateRequest> updateTeam(
+      @PathVariable UUID teamId,
+      @Valid @RequestBody TeamUpdateRequest request
+  ) {
+    return teamService.updateTeam(teamId, request);
+  }
+
+  // 팀 정보 삭제
+  @DeleteMapping("/{teamId}")
+  public ApiResponse<Void> deleteTeam(
+      @PathVariable UUID teamId
+  ) {
+    return teamService.deleteTeam(teamId);
+  }
+
+  // 관심 팀 추가/삭제
+  @GetMapping("/fav/{teamId}")
+  public ApiResponse<Void> favTeam(
+      @PathVariable UUID teamId
+  ) {
+    return teamService.favTeam(teamId);
   }
 }

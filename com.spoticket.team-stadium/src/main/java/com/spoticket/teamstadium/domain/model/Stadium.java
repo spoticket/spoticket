@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 import org.locationtech.jts.geom.Point;
 
-@Entity(name = "P_STADIUM")
+@Entity(name = "p_stadiums")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

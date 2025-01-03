@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
-@Entity(name = "P_FAV_TEAMS")
+@Entity(name = "p_fav_teams")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -33,4 +33,13 @@ public class FavTeam {
   @Column(nullable = false)
   private UUID userId;
 
+  public static FavTeam create(
+      UUID userId,
+      Team team
+  ) {
+    return FavTeam.builder()
+        .userId(userId)
+        .team(team)
+        .build();
+  }
 }

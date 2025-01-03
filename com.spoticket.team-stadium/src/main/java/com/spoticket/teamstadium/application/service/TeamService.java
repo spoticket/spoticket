@@ -1,6 +1,7 @@
 package com.spoticket.teamstadium.application.service;
 
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
+import com.spoticket.teamstadium.application.dto.request.TeamUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.GameReadResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamInfoResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamListReadResponse;
@@ -15,6 +16,7 @@ import com.spoticket.teamstadium.exception.ErrorCode;
 import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,6 +35,7 @@ public class TeamService {
   //  private final GameServiceClient gameServiceClient;
 
   // 팀 정보 등록
+  @Transactional
   public ApiResponse<Map<String, UUID>> createTeam(TeamCreateRequest request) {
 
     // 요청자 권한 체크
@@ -98,6 +101,67 @@ public class TeamService {
     return PaginatedResponse.of(response);
   }
 
+  // 팀 정보 수정
+  @Transactional
+  public ApiResponse<TeamUpdateRequest> updateTeam(
+      UUID teamId,
+      TeamUpdateRequest request
+  ) {
+    // 요청자 권한 체크 필요
+
+    Team team = getTeamById(teamId);
+    if (request.name() != null &&
+        teamRepository.findByNameAndIsDeletedFalse(request.name())
+            .filter(existingTeam -> !existingTeam.getTeamId().equals(teamId))
+            .isPresent()) {
+      throw new BusinessException(ErrorCode.DUPLICATE_TEAM_NAME);
+    }
+    team.update(
+        request.name(), request.description(),
+        request.profile(), request.homeLink(),
+        request.snsLink()
+    );
+    teamRepository.save(team);
+    return new ApiResponse<>(200, "수정 완료", null);
+  }
+
+  // 팀 정보 삭제
+  @Transactional
+  public ApiResponse<Void> deleteTeam(UUID teamId) {
+    // 요청자 권한 체크 필요
+
+    Team team = getTeamById(teamId);
+
+    List<FavTeam> favTeams = favTeamRepository.findAllByTeamId(teamId);
+    favTeamRepository.deleteAll(favTeams);
+
+    team.deleteBase();
+    teamRepository.save(team);
+
+    return new ApiResponse<>(200, "삭제 완료", null);
+  }
+
+  // 관심 팀 추가/삭제
+  @Transactional
+  public ApiResponse<Void> favTeam(UUID teamId) {
+    // 요청자 id 추출 필요
+    UUID userId = UUID.fromString("6844ee91-b725-4606-b06a-df7c7a58e452");// 임시값
+    Team team = getTeamById(teamId);
+    boolean isAdded;
+
+    FavTeam favTeam = favTeamRepository.findByUserIdAndTeam_TeamId(userId, teamId).orElse(null);
+    if (favTeam == null) {
+      favTeam = FavTeam.create(userId, team);
+      favTeamRepository.save(favTeam);
+      isAdded = true;
+    } else {
+      favTeamRepository.delete(favTeam);
+      isAdded = false;
+    }
+    String message = isAdded ? "관심 팀에 추가되었습니다" : "관심 팀에서 삭제되었습니다";
+    return new ApiResponse<>(200, message, null);
+  }
+
   public Team getTeamById(UUID teamId) {
     return teamRepository.findByTeamIdAndIsDeletedFalse(teamId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
@@ -113,6 +177,5 @@ public class TeamService {
     }
     return teamRepository.findAllByTeamIdInAndIsDeletedFalse(teamIds, pageable);
   }
-
 
 }

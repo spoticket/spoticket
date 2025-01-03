@@ -11,8 +11,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.util.StringUtils;
 
-@Entity(name = "P_TEAMS")
+@Entity(name = "p_teams")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,18 +26,22 @@ public class Team extends BaseEntity {
   @Column(updatable = false, nullable = false)
   private UUID teamId;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 100)
   private String name;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 20)
   private TeamCategoryEnum category;
 
+  @Column(columnDefinition = "TEXT")
   private String description;
 
+  @Column(length = 500)
   private String profile;
 
+  @Column(length = 300)
   private String homeLink;
 
+  @Column(length = 300)
   private String snsLink;
 
   public static Team create(
@@ -64,19 +69,19 @@ public class Team extends BaseEntity {
       String homeLink,
       String snsLink
   ) {
-    if (name != null) {
+    if (name != null && StringUtils.hasText(name) && name.length() <= 100) {
       this.name = name;
     }
-    if (description != null) {
+    if (description == null || description.length() <= 500) {
       this.description = description;
     }
-    if (profile != null) {
+    if (profile == null || profile.length() <= 500) {
       this.profile = profile;
     }
-    if (homeLink != null) {
+    if (homeLink == null || homeLink.length() <= 300) {
       this.homeLink = homeLink;
     }
-    if (snsLink != null) {
+    if (snsLink == null || snsLink.length() <= 300) {
       this.snsLink = snsLink;
     }
   }
