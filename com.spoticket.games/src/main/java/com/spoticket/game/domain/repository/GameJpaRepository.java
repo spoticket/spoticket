@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GameRepository extends JpaRepository<Game, UUID> {
+public interface GameJpaRepository extends JpaRepository<Game, UUID> {
 
   Page<GameResponse> findAllByStadiumIdAndIsDeleteFalse(UUID stadiumId, Pageable pageable);
 
