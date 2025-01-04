@@ -37,7 +37,16 @@ spring:
         locator:
           enabled: true
 
+  # Authorization Rules
+  config:
+    import:
+      - authorization-rule.yml
+
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+service:
+  jwt:
+    secret-key: "67mE67CA7J6F64uI64ukIOuLpOuTpCDsp4DsvJzso7zshLjsmpQ="

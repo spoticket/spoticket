@@ -1,5 +1,6 @@
-package com.spoticket.user.domain.model;
+package com.spoticket.user.domain.model.entity;
 
+import com.spoticket.user.domain.model.UserRole;
 import com.spoticket.user.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,12 +44,12 @@ public class User extends BaseEntity {
     private String address;
     private String addressDetail;
 
-    public static User of(String email, String password, String slackId, String name, String gender, Date birthday, Integer post, String address, String addressDetail) {
+    public static User of(String email, String password, String slackId, UserRole role, String name, String gender, Date birthday, Integer post, String address, String addressDetail) {
         return User.builder()
                 .email(email)
                 .password(password)
                 .slackId(slackId)
-                .role(UserRole.ROLE_USER)
+                .role(role)
                 .name(name)
                 .gender(gender)
                 .birthday(birthday)

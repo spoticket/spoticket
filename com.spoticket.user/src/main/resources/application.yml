@@ -2,6 +2,18 @@ spring:
   application:
     name: user
 
+  datasource:
+    url: jdbc:postgresql://localhost:15432/spoticket_user
+    username: spoticket_user
+    password: spoticket_user
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
 server:
   port: 8081
 
@@ -9,3 +21,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+service:
+  jwt:
+    access-expiration: 360000
+    secret-key: "67mE67CA7J6F64uI64ukIOuLpOuTpCDsp4DsvJzso7zshLjsmpQ="
