@@ -43,12 +43,6 @@ public class GameController {
     return ok(gameQueryService.getGame(gameId));
   }
 
-  /*@GetMapping
-  public DataResponse<PagedModel<GameResponse>> getGamesByStadiumId(UUID stadiumId,
-      Pageable pageable) {
-    return ok(gameQueryService.getGamesByStadiumId(stadiumId, pageable));
-  }*/
-
   @GetMapping
   public DataResponse<PagedModel<GameResponse>> getGames(SearchCondition condition,
       Pageable pageable) {

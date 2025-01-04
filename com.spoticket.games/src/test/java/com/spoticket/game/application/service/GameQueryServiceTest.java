@@ -41,7 +41,7 @@ class GameQueryServiceTest {
   @Test
   void getGame_success() {
     // given
-    when(gameJpaRepository.findByGameIdAndIsDeleteFalse(any(UUID.class))).thenReturn(
+    when(gameJpaRepository.findByGameIdAndIsDeletedFalse(any(UUID.class))).thenReturn(
         Optional.of(game));
 
     // when
@@ -75,7 +75,7 @@ class GameQueryServiceTest {
   @Test
   void getGame_notFound() {
     // given
-    when(gameJpaRepository.findByGameIdAndIsDeleteFalse(any(UUID.class))).thenReturn(
+    when(gameJpaRepository.findByGameIdAndIsDeletedFalse(any(UUID.class))).thenReturn(
         Optional.empty());
 
     // when & then

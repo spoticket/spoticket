@@ -27,7 +27,6 @@ class GameDataInitializationTest {
   @Test
   void init() {
     UUID stadiumId = randomUUID();
-
     for (int i = 0; i < 100; i++) {
       String title = "Game " + i;
       LocalDateTime startTime = now().plusDays(i);
