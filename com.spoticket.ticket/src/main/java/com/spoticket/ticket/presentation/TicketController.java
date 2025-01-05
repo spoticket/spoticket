@@ -9,6 +9,7 @@ import com.spoticket.ticket.global.exception.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +45,13 @@ public class TicketController {
     TicketResponse ticketResponse = ticketService.updateTicketStatus(ticketId, request);
 
     return ApiResponse.success(ticketResponse, "티켓 상태 변경 완료");
+  }
+
+  @DeleteMapping("/{ticketId}")
+  public ApiResponse<TicketResponse> deleteTicket(@PathVariable UUID ticketId) {
+    TicketResponse ticketResponse = ticketService.deleteTicket(ticketId);
+
+    return ApiResponse.success(ticketResponse, "티켓이 성공적으로 삭제되었습니다.");
   }
 
 }

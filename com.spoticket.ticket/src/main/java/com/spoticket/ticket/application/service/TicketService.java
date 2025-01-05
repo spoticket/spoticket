@@ -55,4 +55,14 @@ public class TicketService {
 
     return TicketResponse.from(ticket);
   }
+
+  @Transactional
+  public TicketResponse deleteTicket(UUID ticketId) {
+    Ticket ticket = ticketRepository.findById(ticketId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.TICKET_NOT_FOUND));
+
+    ticket.update(TicketStatus.DELETED);
+
+    return TicketResponse.from(ticket);
+  }
 }
