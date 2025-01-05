@@ -2,7 +2,7 @@
 name: feature-request-template
 about: "\U0001F4DD 새로운 기능 요청 이슈 템플릿 작성"
 title: "[FEATURE]"
-labels: enhancement
+labels: feature
 assignees: ''
 
 ---
