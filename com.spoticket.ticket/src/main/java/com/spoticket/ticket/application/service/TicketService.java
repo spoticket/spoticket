@@ -1,6 +1,7 @@
 package com.spoticket.ticket.application.service;
 
 import com.spoticket.ticket.application.dtos.request.CreateTicketRequest;
+import com.spoticket.ticket.application.dtos.request.UpdateTicketStatusRequest;
 import com.spoticket.ticket.application.dtos.response.TicketInfoResponse;
 import com.spoticket.ticket.application.dtos.response.TicketResponse;
 import com.spoticket.ticket.domain.entity.Ticket;
@@ -43,5 +44,15 @@ public class TicketService {
         .orElseThrow(() -> new BusinessException(ErrorCode.TICKET_NOT_FOUND));
 
     return TicketInfoResponse.from(ticket);
+  }
+
+  @Transactional
+  public TicketResponse updateTicketStatus(UUID ticketId, UpdateTicketStatusRequest request) {
+    Ticket ticket = ticketRepository.findById(ticketId)
+        .orElseThrow(() -> new BusinessException(ErrorCode.TICKET_NOT_FOUND));
+
+    ticket.update(request.status());
+
+    return TicketResponse.from(ticket);
   }
 }

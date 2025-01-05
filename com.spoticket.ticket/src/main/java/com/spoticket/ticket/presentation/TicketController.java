@@ -1,6 +1,7 @@
 package com.spoticket.ticket.presentation;
 
 import com.spoticket.ticket.application.dtos.request.CreateTicketRequest;
+import com.spoticket.ticket.application.dtos.request.UpdateTicketStatusRequest;
 import com.spoticket.ticket.application.dtos.response.TicketInfoResponse;
 import com.spoticket.ticket.application.dtos.response.TicketResponse;
 import com.spoticket.ticket.application.service.TicketService;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +36,14 @@ public class TicketController {
     TicketInfoResponse ticketInfoResponse = ticketService.getTicketById(ticketId);
 
     return ApiResponse.success(ticketInfoResponse, "조회 성공");
+  }
+
+  @PatchMapping("/{ticketId}")
+  public ApiResponse<TicketResponse> updateTicketStatus(@PathVariable UUID ticketId,
+      @RequestBody UpdateTicketStatusRequest request) {
+    TicketResponse ticketResponse = ticketService.updateTicketStatus(ticketId, request);
+
+    return ApiResponse.success(ticketResponse, "티켓 상태 변경 완료");
   }
 
 }
