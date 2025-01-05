@@ -9,6 +9,7 @@ public enum ErrorCode {
 
   // 티켓 관련 오류
   SEAT_ALREADY_RESERVED(400, "이미 예약된 좌석입니다."),
+  TICKET_NOT_FOUND(404, "티켓을 찾을 수 없습니다."),
 
   // 인증 오류
   UNAUTHORIZED_EXCEPTION(401, "인증에 실패하였습니다."),
