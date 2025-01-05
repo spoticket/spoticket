@@ -11,15 +11,15 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ApiSuccessResponse<T> {
 
-    private int status;
-    private String message;
+    private int code;
+    private String msg;
     private T data;
 
 
     public static <T> ApiSuccessResponse<T> success(T data) {
         return ApiSuccessResponse.<T>builder()
-            .status(200)
-            .message("success")
+            .code(200)
+            .msg("success")
             .data(data)
             .build();
 
