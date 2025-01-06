@@ -48,4 +48,8 @@ public class Ticket extends BaseEntity {
         .build();
   }
 
+  public void update(TicketStatus status) {
+    this.status = status;
+  }
+  
 }
