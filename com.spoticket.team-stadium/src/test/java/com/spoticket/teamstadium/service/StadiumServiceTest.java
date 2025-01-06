@@ -4,13 +4,16 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.spoticket.teamstadium.application.dto.request.StadiumCreateRequest;
+import com.spoticket.teamstadium.application.dto.request.StadiumUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.StadiumReadResponse;
 import com.spoticket.teamstadium.application.service.StadiumService;
 import com.spoticket.teamstadium.domain.model.Stadium;
@@ -191,6 +194,93 @@ class StadiumServiceTest {
         .hasMessage(ErrorCode.STADIUM_NOT_FOUND.getMessage());
 
     verify(stadiumRepository, times(1)).findByStadiumIdAndIsDeletedFalse(stadiumId);
+  }
+
+  // 경기장 정보 수정
+  @Test
+  void updateStadium_success() {
+    // Given
+    UUID stadiumId = UUID.randomUUID();
+
+    Stadium existingStadium = Stadium.builder()
+        .stadiumId(stadiumId)
+        .name("temp stadium name")
+        .address("temp address")
+        .latLng(new GeometryFactory().createPoint(new Coordinate(45.678, 12.345)))
+        .build();
+
+    StadiumUpdateRequest request = new StadiumUpdateRequest(
+        "update name",
+        "update address",
+        "update seatImage",
+        "description",
+        11.222,
+        22.3333
+    );
+
+    when(stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId)).thenReturn(
+        Optional.of(existingStadium));
+    when(stadiumRepository.findByNameAndIsDeletedFalse(request.name()))
+        .thenReturn(Optional.empty());
+
+    // When
+    ApiResponse<Void> response = stadiumService.updateStadium(stadiumId, request);
+
+    // Then
+    assertEquals(200, response.code());
+    assertEquals("수정 완료", response.msg());
+    assertEquals("update name", existingStadium.getName());
+    assertEquals("update seatImage", existingStadium.getSeatImage());
+    verify(stadiumRepository).save(existingStadium);
+  }
+
+  @Test
+  void updateStadium_WhenStadiumDoesNotExist() {
+    // Given
+    UUID stadiumId = UUID.randomUUID();
+    StadiumUpdateRequest request = new StadiumUpdateRequest(
+        "update name",
+        "update address",
+        "update seatImage",
+        "description",
+        11.222,
+        22.3333
+    );
+
+    when(stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId)).thenReturn(
+        Optional.empty());
+
+    // Then
+    assertThatThrownBy(() -> stadiumService.updateStadium(stadiumId, request))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessage("해당하는 경기장이 없습니다");
+
+    verify(stadiumRepository, never()).save(any());
+  }
+
+  // 경기장 삭제
+  @Test
+  void deleteStadium_success() {
+    // Given
+    UUID stadiumId = UUID.randomUUID();
+    Stadium stadium = Stadium.builder()
+        .stadiumId(stadiumId)
+        .name("temp stadium name")
+        .address("temp address")
+        .latLng(new GeometryFactory().createPoint(new Coordinate(45.678, 12.345)))
+        .build();
+    when(stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId))
+        .thenReturn(Optional.of(stadium));
+
+    // When
+    ApiResponse<Void> res = stadiumService.deleteStadium(stadiumId);
+
+    // Then
+    assertNotNull(res);
+    assertEquals(200, res.code());
+    assertEquals("삭제 완료", res.msg());
+    assertTrue(stadium.isDeleted());
+    verify(stadiumRepository, times(1)).save(stadium);
   }
 }
 
