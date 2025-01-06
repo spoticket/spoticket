@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +51,14 @@ public class SeatController {
       @Valid @RequestBody SeatUpdateRequest request
   ) {
     return seatService.updateSeat(seatId, request);
+  }
+
+  // 좌석 정보 삭제
+  @DeleteMapping("/{seatId}")
+  public ApiResponse<Void> deleteSeat(
+      @PathVariable UUID seatId
+  ) {
+    return seatService.deleteSeat(seatId);
   }
 
 }

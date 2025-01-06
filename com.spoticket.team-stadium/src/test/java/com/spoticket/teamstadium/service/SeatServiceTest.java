@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -20,6 +21,7 @@ import com.spoticket.teamstadium.domain.model.Stadium;
 import com.spoticket.teamstadium.domain.repository.SeatRepository;
 import com.spoticket.teamstadium.exception.BusinessException;
 import com.spoticket.teamstadium.exception.ErrorCode;
+import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.factory.SeatTestFactory;
 import com.spoticket.teamstadium.factory.StadiumTestFactory;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
@@ -253,6 +255,53 @@ class SeatServiceTest {
     verify(seatRepository, times(1)).findBySeatIdAndIsDeletedFalse(seatId);
     verify(seatRepository, times(1)).findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
         duplicateSection, gameId, stadiumId);
+    verify(seatRepository, never()).save(any(Seat.class));
+  }
+
+  // 삭제
+  @Test
+  void deleteSeat_success() {
+    // Given
+    UUID seatId = UUID.randomUUID();
+
+    Stadium stadium = Stadium.builder()
+        .stadiumId(UUID.randomUUID())
+        .name("Test Stadium")
+        .build();
+
+    Seat seat = Seat.builder()
+        .seatId(seatId)
+        .stadium(stadium)
+        .section("A")
+        .quantity(100L)
+        .price(50000)
+        .build();
+
+    when(seatRepository.findBySeatIdAndIsDeletedFalse(seatId)).thenReturn(Optional.of(seat));
+    when(seatRepository.save(any(Seat.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+    // When
+    ApiResponse<Void> response = seatService.deleteSeat(seatId);
+
+    // Then
+    assertNotNull(response);
+    assertEquals(200, response.code());
+    assertEquals("삭제 완료", response.msg());
+
+    verify(seatRepository, times(1)).findBySeatIdAndIsDeletedFalse(seatId);
+    verify(seatRepository, times(1)).save(any(Seat.class));
+    assertTrue(seat.isDeleted());
+  }
+
+  @Test
+  void deleteSeat_WhenSeatNotFound() {
+    // Given
+    UUID seatId = UUID.randomUUID();
+    when(seatRepository.findBySeatIdAndIsDeletedFalse(seatId)).thenReturn(Optional.empty());
+
+    // When, Then
+    assertThrows(NotFoundException.class, () -> seatService.deleteSeat(seatId));
+    verify(seatRepository, times(1)).findBySeatIdAndIsDeletedFalse(seatId);
     verify(seatRepository, never()).save(any(Seat.class));
   }
 }

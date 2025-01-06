@@ -6,6 +6,7 @@ import com.spoticket.teamstadium.application.dto.response.SeatListReadResponse;
 import com.spoticket.teamstadium.domain.model.Seat;
 import com.spoticket.teamstadium.domain.model.Stadium;
 import com.spoticket.teamstadium.domain.repository.SeatRepository;
+import com.spoticket.teamstadium.domain.repository.StadiumRepository;
 import com.spoticket.teamstadium.exception.BusinessException;
 import com.spoticket.teamstadium.exception.ErrorCode;
 import com.spoticket.teamstadium.exception.NotFoundException;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SeatService {
 
   private final SeatRepository seatRepository;
-  private final StadiumService stadiumService;
+  private final StadiumRepository stadiumRepository;
 
   // 좌석 정보 등록
   @Transactional
@@ -46,7 +47,7 @@ public class SeatService {
       throw new BusinessException(ErrorCode.DUPLICATE_SEAT_NAME);
     }
 
-    Stadium stadium = stadiumService.getStadiumById(stadiumId);
+    Stadium stadium = getStadium(stadiumId);
 
     Seat seat = Seat.create(
         request.gameId(),
@@ -69,7 +70,7 @@ public class SeatService {
   )
   public ApiResponse<List<SeatListReadResponse>> getSeatList(UUID stadiumId, UUID gameId) {
 
-    stadiumService.getStadiumById(stadiumId);
+    getStadium(stadiumId);
 
     List<Seat> seats = seatRepository.findAllByGameIdAndStadium_StadiumIdAndIsDeletedFalse(
         stadiumId, gameId
@@ -90,7 +91,7 @@ public class SeatService {
   @Transactional
   @CacheEvict(
       value = "seatListCache",
-      key = "'stadium:' + #stadiumId + ':game:' + #request.gameId()"
+      key = "'stadium:' + #stadiumId + ':game:' + #gameId"
   )
   public ApiResponse<Void> updateSeat(
       UUID seatId,
@@ -99,8 +100,10 @@ public class SeatService {
     // 요청자 권한 확인
 
     Seat seat = getSeatById(seatId);
+    UUID stadiumId = seat.getStadium().getStadiumId();
+    UUID gameId = seat.getGameId();
     if (seatRepository.findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
-            request.section(), seat.getGameId(), seat.getStadium().getStadiumId())
+            request.section(), gameId, stadiumId)
         .isPresent()) {
       throw new BusinessException(ErrorCode.DUPLICATE_SEAT_NAME);
     }
@@ -111,8 +114,35 @@ public class SeatService {
     return new ApiResponse<>(200, "수정 완료", null);
   }
 
+  // 좌석 정보 삭제
+  @Transactional
+  public ApiResponse<Void> deleteSeat(UUID seatId) {
+
+    // 요청자 권한 확인
+    Seat seat = getSeatById(seatId);
+    seat.deleteBase();
+    seatRepository.save(seat);
+
+    return new ApiResponse<>(200, "삭제 완료", null);
+  }
+
+  public void deleteSeatList(List<Seat> seats) {
+    for (Seat seat : seats) {
+      seat.deleteBase();
+    }
+  }
+
   public Seat getSeatById(UUID seatId) {
     return seatRepository.findBySeatIdAndIsDeletedFalse(seatId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.SEAT_NOT_FOUND));
+  }
+
+  private Stadium getStadium(UUID stadiumId) {
+    Stadium stadium = stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId)
+        .orElse(null);
+    if (stadium == null) {
+      throw new BusinessException(ErrorCode.STADIUM_NOT_FOUND);
+    }
+    return stadium;
   }
 }
