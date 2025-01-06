@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.util.StringUtils;
 
 @Entity(name = "p_seats")
 @NoArgsConstructor
@@ -31,7 +32,7 @@ public class Seat extends BaseEntity {
   @Column(nullable = false)
   private UUID gameId;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 100)
   private String section;
 
   @Min(0)
@@ -67,7 +68,7 @@ public class Seat extends BaseEntity {
       Long quantity,
       Integer price
   ) {
-    if (section != null) {
+    if (section != null && StringUtils.hasText(section) && section.length() <= 100) {
       this.section = section;
     }
     if (quantity != null) {

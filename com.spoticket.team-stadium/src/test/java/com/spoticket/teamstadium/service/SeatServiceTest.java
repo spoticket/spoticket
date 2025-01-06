@@ -6,11 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.spoticket.teamstadium.application.dto.request.SeatCreateRequest;
+import com.spoticket.teamstadium.application.dto.request.SeatUpdateRequest;
 import com.spoticket.teamstadium.application.service.SeatService;
 import com.spoticket.teamstadium.application.service.StadiumService;
 import com.spoticket.teamstadium.domain.model.Seat;
@@ -169,4 +171,88 @@ class SeatServiceTest {
         .findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(section, gameId, stadiumId);
   }
 
+  // 수정
+  @Test
+  void updateSeat_success() {
+    // Given
+    UUID seatId = UUID.randomUUID();
+    UUID stadiumId = UUID.randomUUID();
+    UUID gameId = UUID.randomUUID();
+    String section = "A";
+
+    Seat existingSeat = Seat.builder()
+        .seatId(seatId)
+        .section("B")
+        .quantity(50L)
+        .price(10000)
+        .stadium(Stadium.builder().stadiumId(stadiumId).build())
+        .gameId(gameId)
+        .build();
+
+    SeatUpdateRequest request = new SeatUpdateRequest(section, 100L, 20000);
+
+    when(seatRepository.findBySeatIdAndIsDeletedFalse(seatId)).thenReturn(
+        Optional.of(existingSeat));
+    when(seatRepository.findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
+        section, gameId, stadiumId)).thenReturn(Optional.empty());
+    when(seatRepository.save(any(Seat.class))).thenReturn(existingSeat);
+
+    // When
+    ApiResponse<Void> response = seatService.updateSeat(seatId, request);
+
+    // Then
+    verify(seatRepository, times(1)).findBySeatIdAndIsDeletedFalse(seatId);
+    verify(seatRepository, times(1)).findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
+        section, gameId, stadiumId);
+    verify(seatRepository, times(1)).save(existingSeat);
+
+    assertNotNull(response);
+    assertEquals(200, response.code());
+    assertEquals("수정 완료", response.msg());
+  }
+
+  @Test
+  void updateSeat_WhenDuplicateSectionExists() {
+    // Given
+    UUID seatId = UUID.randomUUID();
+    UUID stadiumId = UUID.randomUUID();
+    UUID gameId = UUID.randomUUID();
+    String duplicateSection = "A";
+
+    Seat existingSeat = Seat.builder()
+        .seatId(seatId)
+        .section("B")
+        .quantity(50L)
+        .price(10000)
+        .stadium(Stadium.builder().stadiumId(stadiumId).build())
+        .gameId(gameId)
+        .build();
+
+    Seat duplicateSeat = Seat.builder()
+        .seatId(UUID.randomUUID())
+        .section(duplicateSection)
+        .quantity(30L)
+        .price(8000)
+        .stadium(Stadium.builder().stadiumId(stadiumId).build())
+        .gameId(gameId)
+        .build();
+
+    SeatUpdateRequest request = new SeatUpdateRequest(duplicateSection, 100L, 20000);
+
+    when(seatRepository.findBySeatIdAndIsDeletedFalse(seatId)).thenReturn(
+        Optional.of(existingSeat));
+    when(seatRepository.findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
+        duplicateSection, gameId, stadiumId)).thenReturn(Optional.of(duplicateSeat));
+
+    // When, Then
+    BusinessException exception = assertThrows(BusinessException.class,
+        () -> seatService.updateSeat(seatId, request));
+
+    assertEquals(ErrorCode.DUPLICATE_SEAT_NAME.getCode(), exception.getCode());
+
+    verify(seatRepository, times(1)).findBySeatIdAndIsDeletedFalse(seatId);
+    verify(seatRepository, times(1)).findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
+        duplicateSection, gameId, stadiumId);
+    verify(seatRepository, never()).save(any(Seat.class));
+  }
 }

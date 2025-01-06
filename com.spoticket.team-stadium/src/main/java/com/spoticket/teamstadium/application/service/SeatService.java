@@ -1,6 +1,7 @@
 package com.spoticket.teamstadium.application.service;
 
 import com.spoticket.teamstadium.application.dto.request.SeatCreateRequest;
+import com.spoticket.teamstadium.application.dto.request.SeatUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.SeatListReadResponse;
 import com.spoticket.teamstadium.domain.model.Seat;
 import com.spoticket.teamstadium.domain.model.Stadium;
@@ -83,6 +84,31 @@ public class SeatService {
         .toList();
 
     return new ApiResponse<>(200, "조회 완료", response);
+  }
+
+  // 좌석 정보 수정
+  @Transactional
+  @CacheEvict(
+      value = "seatListCache",
+      key = "'stadium:' + #stadiumId + ':game:' + #request.gameId()"
+  )
+  public ApiResponse<Void> updateSeat(
+      UUID seatId,
+      SeatUpdateRequest request
+  ) {
+    // 요청자 권한 확인
+
+    Seat seat = getSeatById(seatId);
+    if (seatRepository.findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
+            request.section(), seat.getGameId(), seat.getStadium().getStadiumId())
+        .isPresent()) {
+      throw new BusinessException(ErrorCode.DUPLICATE_SEAT_NAME);
+    }
+
+    seat.update(request.section(), request.quantity(), request.price());
+    seatRepository.save(seat);
+
+    return new ApiResponse<>(200, "수정 완료", null);
   }
 
   public Seat getSeatById(UUID seatId) {
