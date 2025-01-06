@@ -1,6 +1,7 @@
 package com.spoticket.teamstadium.domain.repository;
 
 import com.spoticket.teamstadium.domain.model.Seat;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,4 +13,6 @@ public interface SeatRepository {
       String section, UUID gameId, UUID stadiumId);
 
   Seat save(Seat seat);
+
+  List<Seat> findAllByGameIdAndStadium_StadiumIdAndIsDeletedFalse(UUID stadiumId, UUID gameId);
 }

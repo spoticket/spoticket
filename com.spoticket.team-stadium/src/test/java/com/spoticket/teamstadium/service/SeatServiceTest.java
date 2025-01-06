@@ -3,6 +3,7 @@ package com.spoticket.teamstadium.service;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -142,4 +143,30 @@ class SeatServiceTest {
     assertNotNull(response.data().get("seatId"));
     assertEquals(seatId, response.data().get("seatId"));
   }
+
+  @Test
+  void createSeat_ShouldThrowBusinessException_WhenDuplicateSeatExists() {
+    // Given
+    UUID stadiumId = UUID.randomUUID();
+    UUID gameId = UUID.randomUUID();
+    String section = "S ";
+    Seat existingSeat = Seat.builder()
+        .gameId(gameId)
+        .section(section)
+        .stadium(Stadium.builder().stadiumId(stadiumId).build())
+        .build();
+
+    when(seatRepository.findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
+        section, gameId, stadiumId)).thenReturn(Optional.of(existingSeat));
+
+    SeatCreateRequest request = new SeatCreateRequest(gameId, section, 100L, 5000);
+
+    // When & Then
+    BusinessException ex = assertThrows(BusinessException.class,
+        () -> seatService.createSeat(stadiumId, request));
+    assertEquals(ErrorCode.DUPLICATE_SEAT_NAME.getCode(), ex.getCode());
+    verify(seatRepository, times(1))
+        .findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(section, gameId, stadiumId);
+  }
+
 }

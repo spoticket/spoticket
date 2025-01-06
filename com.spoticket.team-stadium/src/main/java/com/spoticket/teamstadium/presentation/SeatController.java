@@ -1,12 +1,15 @@
 package com.spoticket.teamstadium.presentation;
 
 import com.spoticket.teamstadium.application.dto.request.SeatCreateRequest;
+import com.spoticket.teamstadium.application.dto.response.SeatListReadResponse;
 import com.spoticket.teamstadium.application.service.SeatService;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,4 +31,14 @@ public class SeatController {
   ) {
     return seatService.createSeat(stadiumId, request);
   }
+
+  // 좌석 정보 목록 조회
+  @GetMapping("/{stadiumId}/{gameId}")
+  public ApiResponse<List<SeatListReadResponse>> getSeatList(
+      @PathVariable UUID stadiumId,
+      @PathVariable UUID gameId
+  ) {
+    return seatService.getSeatList(stadiumId, gameId);
+  }
+
 }
