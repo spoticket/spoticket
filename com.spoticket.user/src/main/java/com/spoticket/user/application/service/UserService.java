@@ -22,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
 import java.util.UUID;
 
 import static com.spoticket.user.domain.model.entity.QUser.user;
@@ -76,9 +75,8 @@ public class UserService {
     public SuccessResponse<?> changeRole(UUID currentUserId, String role, UserRoleChangeRequestDto request, UUID targetUserId) {
 
         // 자기 자신이 아니거나 마스터가 아닐 경우 throw
-        log.info("⚙️⚙️ [UserService] currentUser : {} , role : {} , targetUserId : {} , request : {} ⚙️⚙️");
         if (!role.equals(UserRole.ROLE_MASTER.toString())) {
-            if (!!currentUserId.equals(targetUserId)) {
+            if (!currentUserId.equals(targetUserId)) {
                 throw new CustomException(ErrorStatus.FORBIDDEN);
             }
         }
