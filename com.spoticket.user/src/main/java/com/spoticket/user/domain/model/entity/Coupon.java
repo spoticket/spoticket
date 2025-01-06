@@ -1,4 +1,4 @@
-package com.spoticket.user.domain.model;
+package com.spoticket.user.domain.model.entity;
 
 import com.spoticket.user.global.entity.BaseEntity;
 import jakarta.persistence.*;
