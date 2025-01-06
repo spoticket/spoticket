@@ -29,6 +29,9 @@ public class Seat extends BaseEntity {
   private UUID seatId;
 
   @Column(nullable = false)
+  private UUID gameId;
+
+  @Column(nullable = false)
   private String section;
 
   @Min(0)
@@ -44,12 +47,14 @@ public class Seat extends BaseEntity {
   private Stadium stadium;
 
   public static Seat create(
+      UUID gameId,
       String section,
       long quantity,
       Integer price,
       Stadium stadium
   ) {
     return Seat.builder()
+        .gameId(gameId)
         .section(section)
         .quantity(quantity)
         .price(price)
