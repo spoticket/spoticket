@@ -1,4 +1,4 @@
-package com.spoticket.user.domain.model;
+package com.spoticket.user.domain.model.entity;
 
 import com.spoticket.user.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -27,8 +27,8 @@ public class UserCoupon extends BaseEntity {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
-    @ColumnDefault("NOT_USE")
-    private String status;
+    @ColumnDefault("'NOT_USE'")
+    private String status = "NOT_USE";
 
     public void use() {
         this.status = "USED";

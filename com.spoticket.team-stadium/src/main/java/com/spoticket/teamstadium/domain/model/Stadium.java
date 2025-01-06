@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 import org.locationtech.jts.geom.Point;
+import org.springframework.util.StringUtils;
 
 @Entity(name = "p_stadiums")
 @NoArgsConstructor
@@ -72,18 +73,16 @@ public class Stadium extends BaseEntity {
       String description,
       Point latLng
   ) {
-    if (name != null) {
+    if (name != null && StringUtils.hasText(name) && name.length() <= 100) {
       this.name = name;
     }
-    if (address != null) {
+    if (address != null && address.length() <= 200) {
       this.address = address;
     }
-    if (seatImage != null) {
+    if (seatImage != null && seatImage.length() <= 500) {
       this.seatImage = seatImage;
     }
-    if (description != null) {
-      this.description = description;
-    }
+    this.description = description;
     if (latLng != null) {
       this.latLng = latLng;
     }
