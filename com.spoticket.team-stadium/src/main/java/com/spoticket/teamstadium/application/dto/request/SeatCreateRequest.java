@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record SeatCreateRequest(
-    @NotNull UUID stadiumId,
     @NotNull UUID gameId,
     @NotNull String section,
     @NotNull @Min(0) Long quantity,
