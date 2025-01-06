@@ -8,6 +8,7 @@ import com.spoticket.teamstadium.application.service.StadiumService;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +71,14 @@ public class StadiumController {
       @PathVariable UUID stadiumId
   ) {
     return stadiumService.deleteStadium(stadiumId);
+  }
+
+  // 검색
+  @GetMapping("/search")
+  public ApiResponse<List<StadiumListReadResponse>> searchStadiums(
+      @RequestParam String keyword
+  ) {
+    return stadiumService.searchStadiums(keyword.trim());
   }
 
 }
