@@ -30,20 +30,23 @@ public class Stadium extends BaseEntity {
   @Column(updatable = false, nullable = false)
   private UUID stadiumId;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 100)
   private String name;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 200)
   private String address;
 
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "geometry(Point, 4326)")
   private Point latLng;
 
+  @Column(length = 500)
   private String seatImage;
 
+  @Column(columnDefinition = "TEXT")
   private String description;
 
   @OneToMany(mappedBy = "stadium", fetch = FetchType.LAZY)
+  @Builder.Default
   private List<Seat> seats = new ArrayList<>();
 
   public static Stadium create(
