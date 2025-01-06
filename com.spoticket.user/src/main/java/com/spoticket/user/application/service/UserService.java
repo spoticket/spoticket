@@ -112,6 +112,7 @@ public class UserService {
         return SuccessResponse.ok(response);
     }
 
+    @Transactional(readOnly = true)
     public SuccessResponse<?> selectUserList(Predicate predicate, Pageable pageable) {
         BooleanBuilder booleanBuilder = new BooleanBuilder(predicate);
         booleanBuilder.and(user.isDelete.eq(false));
