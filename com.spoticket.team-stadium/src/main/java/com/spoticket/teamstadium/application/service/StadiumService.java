@@ -104,6 +104,17 @@ public class StadiumService {
     return new ApiResponse<>(200, "수정 완료", null);
   }
 
+  // 경기장 삭제
+  public ApiResponse<Void> deleteStadium(UUID stadiumId) {
+    // 요청자 권한 체크
+
+    Stadium stadium = getStadiumById(stadiumId);
+    stadium.deleteBase();
+    stadiumRepository.save(stadium);
+
+    return new ApiResponse<>(200, "삭제 완료", null);
+  }
+
   public Stadium getStadiumById(UUID stadiumId) {
     return stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.STADIUM_NOT_FOUND));

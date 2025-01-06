@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -255,6 +256,31 @@ class StadiumServiceTest {
         .hasMessage("해당하는 경기장이 없습니다");
 
     verify(stadiumRepository, never()).save(any());
+  }
+
+  // 경기장 삭제
+  @Test
+  void deleteStadium_success() {
+    // Given
+    UUID stadiumId = UUID.randomUUID();
+    Stadium stadium = Stadium.builder()
+        .stadiumId(stadiumId)
+        .name("temp stadium name")
+        .address("temp address")
+        .latLng(new GeometryFactory().createPoint(new Coordinate(45.678, 12.345)))
+        .build();
+    when(stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId))
+        .thenReturn(Optional.of(stadium));
+
+    // When
+    ApiResponse<Void> res = stadiumService.deleteStadium(stadiumId);
+
+    // Then
+    assertNotNull(res);
+    assertEquals(200, res.code());
+    assertEquals("삭제 완료", res.msg());
+    assertTrue(stadium.isDeleted());
+    verify(stadiumRepository, times(1)).save(stadium);
   }
 }
 

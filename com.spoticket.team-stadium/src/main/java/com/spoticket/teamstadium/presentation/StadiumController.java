@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,6 +62,14 @@ public class StadiumController {
       @Valid @RequestBody StadiumUpdateRequest request
   ) {
     return stadiumService.updateStadium(stadiumId, request);
+  }
+
+  // 경기장 삭제
+  @DeleteMapping("/{stadiumId}")
+  public ApiResponse<Void> deleteStadium(
+      @PathVariable UUID stadiumId
+  ) {
+    return stadiumService.deleteStadium(stadiumId);
   }
 
 }
