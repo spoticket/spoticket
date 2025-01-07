@@ -6,6 +6,7 @@ import com.spoticket.teamstadium.application.dto.response.GameReadResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumInfoResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumListReadResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumReadResponse;
+import com.spoticket.teamstadium.domain.model.Seat;
 import com.spoticket.teamstadium.domain.model.Stadium;
 import com.spoticket.teamstadium.domain.repository.StadiumRepository;
 import com.spoticket.teamstadium.exception.BusinessException;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 public class StadiumService {
 
   private final StadiumRepository stadiumRepository;
+  private final SeatService seatService;
 
   @Transactional
   public ApiResponse<Map<String, UUID>> createStadium(StadiumCreateRequest request) {
@@ -109,10 +111,34 @@ public class StadiumService {
     // 요청자 권한 체크
 
     Stadium stadium = getStadiumById(stadiumId);
+
+    // 관련 좌석 정보 삭제 처리
+    List<Seat> seatList = stadium.getSeats();
+    seatService.deleteSeatList(seatList);
     stadium.deleteBase();
     stadiumRepository.save(stadium);
 
     return new ApiResponse<>(200, "삭제 완료", null);
+  }
+
+  // 경기장 검색
+  public ApiResponse<List<StadiumListReadResponse>> searchStadiums(String keyword) {
+
+    if (keyword == null || keyword.trim().isEmpty()) {
+      return new ApiResponse<>(400, "검색어는 공백일 수 없습니다", null);
+    }
+
+    List<Stadium> stadiums = stadiumRepository.searchByKeyword(keyword);
+
+    if (stadiums.isEmpty()) {
+      return new ApiResponse<>(404, "검색 결과가 없습니다", null);
+    }
+
+    List<StadiumListReadResponse> response = stadiums.stream()
+        .map(StadiumListReadResponse::from)
+        .toList();
+
+    return new ApiResponse<>(200, "검색 완료", response);
   }
 
   public Stadium getStadiumById(UUID stadiumId) {
@@ -120,6 +146,4 @@ public class StadiumService {
         .orElseThrow(() -> new NotFoundException(ErrorCode.STADIUM_NOT_FOUND));
 
   }
-
-
 }

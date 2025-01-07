@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GameRepository extends JpaRepository<Game, UUID> {
 
-  Page<GameResponse> findAllByStadiumIdAndIsDeleteFalse(UUID stadiumId, Pageable pageable);
+  Page<GameResponse> findAllByStadiumIdAndIsDeletedFalse(UUID stadiumId, Pageable pageable);
 
-  Optional<Game> findByGameIdAndIsDeleteFalse(UUID gameId);
+  Optional<Game> findByGameIdAndIsDeletedFalse(UUID gameId);
 
 }
