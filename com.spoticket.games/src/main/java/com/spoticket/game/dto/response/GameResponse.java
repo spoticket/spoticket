@@ -1,5 +1,6 @@
 package com.spoticket.game.dto.response;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.spoticket.game.domain.model.Game;
 import com.spoticket.game.domain.model.Sport;
 import java.time.LocalDateTime;
@@ -31,6 +32,20 @@ public class GameResponse {
         .homeTeamId(game.getHomeTeamId())
         .awayTeamId(game.getAwayTeamId())
         .build();
+  }
+
+  @QueryProjection
+  public GameResponse(UUID gameId, String title, LocalDateTime startTime, Sport sport,
+      String league,
+      UUID stadiumId, UUID homeTeamId, UUID awayTeamId) {
+    this.gameId = gameId;
+    this.title = title;
+    this.startTime = startTime;
+    this.sport = sport;
+    this.league = league;
+    this.stadiumId = stadiumId;
+    this.homeTeamId = homeTeamId;
+    this.awayTeamId = awayTeamId;
   }
 
 }

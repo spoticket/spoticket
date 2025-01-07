@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.spoticket.game.domain.model.Game;
 import com.spoticket.game.domain.model.Sport;
-import com.spoticket.game.domain.repository.GameRepository;
+import com.spoticket.game.domain.repository.GameJpaRepository;
 import com.spoticket.game.dto.response.GameResponse;
 import com.spoticket.game.global.exception.CustomException;
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ import org.mockito.MockitoAnnotations;
 class GameQueryServiceTest {
 
   @Mock
-  private GameRepository gameRepository;
+  private GameJpaRepository gameJpaRepository;
 
   @InjectMocks
   private GameQueryService gameQueryService;
@@ -41,7 +41,7 @@ class GameQueryServiceTest {
   @Test
   void getGame_success() {
     // given
-    when(gameRepository.findByGameIdAndIsDeleteFalse(any(UUID.class))).thenReturn(
+    when(gameJpaRepository.findByGameIdAndIsDeletedFalse(any(UUID.class))).thenReturn(
         Optional.of(game));
 
     // when
@@ -75,7 +75,8 @@ class GameQueryServiceTest {
   @Test
   void getGame_notFound() {
     // given
-    when(gameRepository.findByGameIdAndIsDeleteFalse(any(UUID.class))).thenReturn(Optional.empty());
+    when(gameJpaRepository.findByGameIdAndIsDeletedFalse(any(UUID.class))).thenReturn(
+        Optional.empty());
 
     // when & then
     assertThatThrownBy(() -> gameQueryService.getGame(UUID.randomUUID()))

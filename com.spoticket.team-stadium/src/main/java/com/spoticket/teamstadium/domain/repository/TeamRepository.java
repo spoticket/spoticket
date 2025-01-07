@@ -7,14 +7,12 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface TeamRepository {
 
+
   Team save(Team team);
 
-  @Query("SELECT t FROM p_teams t WHERE REPLACE(t.name, ' ', '') = REPLACE(:name, ' ', '') AND t.isDeleted = false")
   Optional<Team> findByNameAndIsDeletedFalse(String name);
 
   Optional<Team> findByTeamIdAndIsDeletedFalse(UUID teamId);
@@ -23,7 +21,7 @@ public interface TeamRepository {
 
   Page<Team> findAllByIsDeletedFalse(Pageable pageable);
 
-  @Query("SELECT t FROM p_teams t WHERE t.teamId IN :teamIds AND t.isDeleted = false")
-  Page<Team> findAllByTeamIdInAndIsDeletedFalse(
-      @Param("teamIds") List<UUID> teamIds, Pageable pageable);
+  Page<Team> findAllByTeamIdInAndIsDeletedFalse(List<UUID> teamIds, Pageable pageable);
+
+  List<Team> searchByKeyword(String keyword);
 }

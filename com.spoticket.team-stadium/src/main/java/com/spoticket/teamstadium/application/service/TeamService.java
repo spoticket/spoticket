@@ -162,6 +162,25 @@ public class TeamService {
     return new ApiResponse<>(200, message, null);
   }
 
+  // 검색
+  public ApiResponse<List<TeamListReadResponse>> searchTeams(String keyword) {
+    if (keyword == null || keyword.trim().isEmpty()) {
+      return new ApiResponse<>(400, "검색어는 공백일 수 없습니다", null);
+    }
+
+    List<Team> teams = teamRepository.searchByKeyword(keyword);
+
+    if (teams.isEmpty()) {
+      return new ApiResponse<>(404, "검색 결과가 없습니다", null);
+    }
+
+    List<TeamListReadResponse> responses = teams.stream()
+        .map(TeamListReadResponse::from)
+        .toList();
+
+    return new ApiResponse<>(200, "검색 완료", responses);
+  }
+
   public Team getTeamById(UUID teamId) {
     return teamRepository.findByTeamIdAndIsDeletedFalse(teamId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
@@ -177,5 +196,4 @@ public class TeamService {
     }
     return teamRepository.findAllByTeamIdInAndIsDeletedFalse(teamIds, pageable);
   }
-
 }

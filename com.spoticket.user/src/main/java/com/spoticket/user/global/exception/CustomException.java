@@ -1,19 +1,13 @@
 package com.spoticket.user.global.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@AllArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public class CustomException extends RuntimeException {
 
-    private final Integer code;
-    private final String msg;
-
-    public CustomException(HttpStatus status) {
-        code = status.value();
-        msg = status.getReasonPhrase();
-    }
+    private final ErrorStatus errorCode;
 
 }
