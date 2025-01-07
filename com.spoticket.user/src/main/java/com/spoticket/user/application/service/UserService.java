@@ -8,6 +8,7 @@ import com.spoticket.user.domain.repository.UserRepository;
 import com.spoticket.user.dto.request.UserLoginRequestDto;
 import com.spoticket.user.dto.request.UserRoleChangeRequestDto;
 import com.spoticket.user.dto.request.UserSignupRequestDto;
+import com.spoticket.user.dto.request.UserUpdateRequestDto;
 import com.spoticket.user.dto.response.UserResponseDto;
 import com.spoticket.user.global.exception.CustomException;
 import com.spoticket.user.global.exception.ErrorStatus;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static com.spoticket.user.domain.model.entity.QUser.user;
+import static com.spoticket.user.global.util.ResponseStatus.USER_INFO_UPDATE;
 import static com.spoticket.user.global.util.ResponseStatus.USER_ROLE_CHANGED;
 
 @Service
@@ -134,5 +136,27 @@ public class UserService {
                 user.getAddressDetail(),
                 user.getSlackId()
         ));
+    }
+
+    @Transactional
+    public SuccessResponse<?> update(UUID userId, UserUpdateRequestDto request) {
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
+        );
+
+        user.update(
+                request.email(),
+                !request.password().isEmpty() ? passwordEncoder.encode(request.password()) : request.password(),
+                request.slackId(),
+                request.name(),
+                request.gender(),
+                request.birthday(),
+                request.post(),
+                request.address(),
+                request.addressDetail()
+        );
+
+        return SuccessResponse.ok(USER_INFO_UPDATE);
     }
 }
