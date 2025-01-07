@@ -26,8 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static com.spoticket.user.domain.model.entity.QUser.user;
-import static com.spoticket.user.global.util.ResponseStatus.USER_INFO_UPDATE;
-import static com.spoticket.user.global.util.ResponseStatus.USER_ROLE_CHANGED;
+import static com.spoticket.user.global.util.ResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -158,5 +157,17 @@ public class UserService {
         );
 
         return SuccessResponse.ok(USER_INFO_UPDATE);
+    }
+
+    @Transactional
+    public SuccessResponse<?> delete(UUID userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
+        );
+
+        user.delete(UUID.fromString("SYSTEM"));
+
+        return SuccessResponse.ok(USER_DELETE);
     }
 }

@@ -13,6 +13,7 @@ public enum ResponseStatus {
 
     USER_ROLE_CHANGED(HttpStatus.NO_CONTENT, "회원 권한이 변경되었습니다."),
     USER_INFO_UPDATE(HttpStatus.NO_CONTENT, "회원정보가 수정되었습니다."),
+    USER_DELETE(HttpStatus.NO_CONTENT, "회원탈퇴 되었습니다."),
 
     COUPON_CREATE(HttpStatus.CREATED, "쿠폰이 생성되었습니다."),
     COUPON_UPDATE(HttpStatus.NO_CONTENT, "쿠폰이 생성되었습니다."),
