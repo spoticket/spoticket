@@ -19,6 +19,7 @@ public enum ErrorStatus {
 
     // user
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "아이디나 비밀번호가 맞지 않습니다."),
+    USER_DUPLICATE(HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
 
     // coupon
     COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "쿠폰을 찾을 수 없습니다."),

@@ -3,6 +3,7 @@ package com.spoticket.game.global.entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,26 +16,26 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
 
-  private boolean isDelete = false;
+  private boolean isDeleted = false;
 
   @CreatedDate
   private LocalDateTime createdAt;
 
   @CreatedBy
-  private String createdBy;
+  private UUID createdBy;
 
   @LastModifiedDate
   private LocalDateTime updatedAt;
 
   @LastModifiedBy
-  private String updatedBy;
+  private UUID updatedBy;
 
   private LocalDateTime deletedAt;
 
-  private String deletedBy;
+  private UUID deletedBy;
 
   public void delete() {
-    isDelete = true;
+    isDeleted = true;
     deletedAt = LocalDateTime.now();
   }
 
