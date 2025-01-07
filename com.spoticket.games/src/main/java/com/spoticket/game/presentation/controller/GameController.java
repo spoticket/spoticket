@@ -10,6 +10,7 @@ import static com.spoticket.game.global.util.ResponseUtils.ok;
 import com.spoticket.game.application.service.GameCommandService;
 import com.spoticket.game.application.service.GameQueryService;
 import com.spoticket.game.dto.request.CreateGameRequest;
+import com.spoticket.game.dto.request.SearchCondition;
 import com.spoticket.game.dto.request.UpdateGameRequest;
 import com.spoticket.game.dto.response.GameResponse;
 import jakarta.validation.Valid;
@@ -35,6 +36,20 @@ public class GameController {
   private final GameCommandService gameCommandService;
   private final GameQueryService gameQueryService;
 
+  // Query
+  @GetMapping("/{gameId}")
+  public DataResponse<GameResponse> getGame(@PathVariable UUID gameId) {
+    return ok(gameQueryService.getGame(gameId));
+  }
+
+  @GetMapping
+  public DataResponse<PagedModel<GameResponse>> getGames(SearchCondition condition,
+      Pageable pageable) {
+    condition.setPageable(pageable);
+    return ok(gameQueryService.getGames(condition));
+  }
+
+  // Command
   @PostMapping
   public DataResponse<GameResponse> createGame(
       @Valid @RequestBody CreateGameRequest request,
@@ -42,17 +57,6 @@ public class GameController {
   ) {
     validateAndThrowIfInvalid(result);
     return created(gameCommandService.createGame(request));
-  }
-
-  @GetMapping("/{gameId}")
-  public DataResponse<GameResponse> getGame(@PathVariable UUID gameId) {
-    return ok(gameQueryService.getGame(gameId));
-  }
-
-  @GetMapping
-  public DataResponse<PagedModel<GameResponse>> getGamesByStadiumId(UUID stadiumId,
-      Pageable pageable) {
-    return ok(gameQueryService.getGamesByStadiumId(stadiumId, pageable));
   }
 
   @PatchMapping("/{gameId}")

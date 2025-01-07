@@ -36,4 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-*.yml
+src/main/java/com/spoticket/game/temp/
+application-dev.yml
