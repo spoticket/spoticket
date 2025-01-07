@@ -72,9 +72,7 @@ public class Team extends BaseEntity {
     if (name != null && StringUtils.hasText(name) && name.length() <= 100) {
       this.name = name;
     }
-    if (description == null || description.length() <= 500) {
-      this.description = description;
-    }
+    this.description = description;
     if (profile == null || profile.length() <= 500) {
       this.profile = profile;
     }
