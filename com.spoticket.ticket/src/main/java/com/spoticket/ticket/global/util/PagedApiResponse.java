@@ -1,4 +1,4 @@
-package com.spoticket.ticket.global.exception;
+package com.spoticket.ticket.global.util;
 
 import lombok.Getter;
 
