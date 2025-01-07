@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static com.spoticket.user.domain.model.entity.QUser.user;
+import static com.spoticket.user.global.exception.ErrorStatus.USER_DUPLICATE;
 import static com.spoticket.user.global.util.ResponseStatus.USER_ROLE_CHANGED;
 
 @Service
@@ -38,6 +39,10 @@ public class UserService {
 
     @Transactional
     public SuccessResponse<?> createUser(UserSignupRequestDto request) {
+
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            throw new CustomException(USER_DUPLICATE);
+        }
 
         User user = User.of(
                 request.email(),

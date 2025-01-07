@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-
 import static com.spoticket.gateway.global.exception.ErrorStatus.FORBIDDEN;
 
 @Component
@@ -37,6 +35,10 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
 
         for (AuthorizationRulesConfig.Rule rule : config.getRules()) {
             if (pathMatches(path, rule.getPath()) && rule.getMethod().contains(method)) {
+                if(rule.getRoles().contains("PUBLIC")){
+                    return chain.filter(exchange);
+                }
+
                 String userRole = exchange.getRequest().getHeaders().getFirst("X-Role");
                 if (rule.getRoles().contains(userRole)) {
                     return chain.filter(exchange);
