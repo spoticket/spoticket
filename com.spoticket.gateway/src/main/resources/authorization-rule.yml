@@ -7,20 +7,20 @@ authorization:
     - path: /api/v1/users/**
       method:
         - GET
-        - POST
-      roles:
-        - PUBLIC
-    - path: /api/v1/users/**
-      method:
-        - GET
-        - POST
-        - PATCH
-        - PUT
-        - DELETE
       roles:
         - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER
     - path: /api/v1/users/test
       method:
         - GET
       roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
         - ROLE_USER
+    - path: /api/v1/users
+      method:
+        - PATCH
+        - GET
+      roles:
+        - ROLE_MASTER

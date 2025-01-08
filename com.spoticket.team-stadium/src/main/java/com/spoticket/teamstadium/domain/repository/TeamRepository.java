@@ -22,4 +22,6 @@ public interface TeamRepository {
   Page<Team> findAllByIsDeletedFalse(Pageable pageable);
 
   Page<Team> findAllByTeamIdInAndIsDeletedFalse(List<UUID> teamIds, Pageable pageable);
+
+  List<Team> searchByKeyword(String keyword);
 }

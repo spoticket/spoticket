@@ -18,6 +18,7 @@ public enum ErrorStatus {
     UNEXPECTED_PRINCIPAL_TYPE(HttpStatus.BAD_REQUEST, "예상치 못한 Principal 타입입니다."),
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "아이디나 비밀번호가 맞지 않습니다."),
+    USER_DUPLICATE(HttpStatus.CONFLICT, "이미 등록된 이메일입니다."),
 
     ;
     private final HttpStatus httpStatus;
