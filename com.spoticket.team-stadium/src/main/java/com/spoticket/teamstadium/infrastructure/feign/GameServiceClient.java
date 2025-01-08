@@ -15,5 +15,11 @@ public interface GameServiceClient {
       @RequestParam("teamId") UUID teamId,
       @RequestParam("page") int page,
       @RequestParam("size") int size);
+
+  @GetMapping("/api/v1/games")
+  ApiResponse<PagedGameResponse> getGamesByStadiumId(
+      @RequestParam("stadiumId") UUID stadiumId,
+      @RequestParam("page") int page,
+      @RequestParam("size") int size);
 }
 

@@ -8,6 +8,7 @@ import com.spoticket.teamstadium.application.service.TeamService;
 import com.spoticket.teamstadium.domain.model.TeamCategoryEnum;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
+import com.spoticket.teamstadium.global.util.RequestUtils;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,9 +36,7 @@ public class TeamController {
   // 팀 정보 등록
   @PostMapping
   public ApiResponse<Map<String, UUID>> createTeam(
-      @Valid @RequestBody TeamCreateRequest request,
-      @RequestHeader("X-User-Id") UUID userId,
-      @RequestHeader("X-Role") String role
+      @Valid @RequestBody TeamCreateRequest request
   ) {
     return teamService.createTeam(request);
   }
@@ -46,10 +44,9 @@ public class TeamController {
   // 팀 정보 단일 조회
   @GetMapping("/{teamId}")
   public ApiResponse<TeamReadResponse> getTeamInfo(
-      @PathVariable UUID teamId,
-      @RequestHeader("X-User-Id") UUID userId
+      @PathVariable UUID teamId
   ) {
-    return teamService.getTeamInfo(teamId, userId);
+    return teamService.getTeamInfo(teamId);
   }
 
   // 팀 목록 조회
@@ -59,9 +56,8 @@ public class TeamController {
       @RequestParam(required = false) Boolean fav,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size
-//      @RequestHeader(name = "userId", required = false) UUID userId
   ) {
-    UUID userId = UUID.fromString("6844ee91-b725-4606-b06a-df7c7a58e452"); // 임시값
+    UUID userId = RequestUtils.getCurrentUserId();
     PaginatedResponse<TeamListReadResponse> response = teamService
         .getTeams(category, fav, userId, page, size);
     return new ApiResponse<>(200, "조회 완료", response);
