@@ -9,6 +9,7 @@ import com.spoticket.teamstadium.domain.model.TeamCategoryEnum;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -83,5 +84,13 @@ public class TeamController {
       @PathVariable UUID teamId
   ) {
     return teamService.favTeam(teamId);
+  }
+
+  // 검색
+  @GetMapping("/search")
+  public ApiResponse<List<TeamListReadResponse>> searchTeams(
+      @RequestParam String keyword
+  ) {
+    return teamService.searchTeams(keyword.trim());
   }
 }

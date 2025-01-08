@@ -121,11 +121,29 @@ public class StadiumService {
     return new ApiResponse<>(200, "삭제 완료", null);
   }
 
+  // 경기장 검색
+  public ApiResponse<List<StadiumListReadResponse>> searchStadiums(String keyword) {
+
+    if (keyword == null || keyword.trim().isEmpty()) {
+      return new ApiResponse<>(400, "검색어는 공백일 수 없습니다", null);
+    }
+
+    List<Stadium> stadiums = stadiumRepository.searchByKeyword(keyword);
+
+    if (stadiums.isEmpty()) {
+      return new ApiResponse<>(404, "검색 결과가 없습니다", null);
+    }
+
+    List<StadiumListReadResponse> response = stadiums.stream()
+        .map(StadiumListReadResponse::from)
+        .toList();
+
+    return new ApiResponse<>(200, "검색 완료", response);
+  }
+
   public Stadium getStadiumById(UUID stadiumId) {
     return stadiumRepository.findByStadiumIdAndIsDeletedFalse(stadiumId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.STADIUM_NOT_FOUND));
 
   }
-
-
 }
