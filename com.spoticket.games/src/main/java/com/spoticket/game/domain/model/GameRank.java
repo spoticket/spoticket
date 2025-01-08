@@ -32,4 +32,11 @@ public class GameRank {
 
   private double score;
 
+  public static GameRank of(Game game, double score) {
+    return GameRank.builder()
+        .game(game)
+        .score(score)
+        .build();
+  }
+
 }

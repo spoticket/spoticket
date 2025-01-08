@@ -35,7 +35,7 @@ class GameQueryServiceTest {
     MockitoAnnotations.openMocks(this);
     game = new Game(UUID.randomUUID(), "test", LocalDateTime.now().plusHours(2),
         Sport.BASKETBALL, "Premier League", UUID.randomUUID(), UUID.randomUUID(),
-        UUID.randomUUID());
+        UUID.randomUUID(), 0L);
   }
 
   @Test

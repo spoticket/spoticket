@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -24,6 +25,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "p_games")
 @Builder
+@ToString(of = "gameId")
 public class Game extends BaseEntity {
 
   @Id
@@ -57,6 +59,7 @@ public class Game extends BaseEntity {
         .stadiumId(stadiumId)
         .homeTeamId(homeTeamId)
         .awayTeamId(awayTeamId)
+        .hits(0L)
         .build();
   }
 
