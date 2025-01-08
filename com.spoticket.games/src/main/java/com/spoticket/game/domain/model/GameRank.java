@@ -1,5 +1,6 @@
 package com.spoticket.game.domain.model;
 
+import com.spoticket.game.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "p_game_ranks")
 @Builder
-public class GameRank {
+public class GameRank extends BaseEntity {
 
   @Id
   @GeneratedValue(generator = "UUID")
