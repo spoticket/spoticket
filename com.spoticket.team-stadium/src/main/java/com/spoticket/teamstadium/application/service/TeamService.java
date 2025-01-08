@@ -16,6 +16,7 @@ import com.spoticket.teamstadium.exception.ErrorCode;
 import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
+import com.spoticket.teamstadium.infrastructure.feign.GameServiceClient;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class TeamService {
 
   private final TeamRepository teamRepository;
   private final FavTeamRepository favTeamRepository;
-  //  private final GameServiceClient gameServiceClient;
+  private final GameServiceClient gameServiceClient;
 
   // 팀 정보 등록
   @Transactional
@@ -69,12 +70,11 @@ public class TeamService {
     boolean isFav = false; // 임시 데이터
     TeamInfoResponse teamInfo = TeamInfoResponse.from(team, favCnt, isFav);
     // 팀 관련 게임 정보 조회 메서드 호출 필요
-//    ApiResponse<List<GameReadResponse>> gameResponse = gameServiceClient.getGamesByTeamId(teamId);
-//    if (gameResponse.code() != 200) {
-//      throw new BusinessException(ErrorCode.GAME_DATA_FETCH_FAILED);
-//    }
-//    List<GameReadResponse> games = gameResponse.data();
-    List<GameReadResponse> games = null;
+    ApiResponse<List<GameReadResponse>> gameResponse = gameServiceClient.getGamesByTeamId(teamId);
+    if (gameResponse.code() != 200) {
+      throw new BusinessException(ErrorCode.GAME_DATA_FETCH_FAILED);
+    }
+    List<GameReadResponse> games = gameResponse.data();
     TeamReadResponse response = new TeamReadResponse(teamInfo, games);
     return new ApiResponse<>(200, "조회 완료", response);
   }
