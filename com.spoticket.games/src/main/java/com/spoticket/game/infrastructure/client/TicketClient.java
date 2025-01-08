@@ -23,7 +23,4 @@ public interface TicketClient {
       @RequestParam(defaultValue = "10") int size
   );
 
-  @GetMapping("/api/v1/tickets/test")
-  String test();
-
 }
