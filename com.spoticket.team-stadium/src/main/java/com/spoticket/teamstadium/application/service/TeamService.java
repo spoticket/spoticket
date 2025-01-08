@@ -3,6 +3,7 @@ package com.spoticket.teamstadium.application.service;
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
 import com.spoticket.teamstadium.application.dto.request.TeamUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.GameReadResponse;
+import com.spoticket.teamstadium.application.dto.response.PagedGameResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamInfoResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamListReadResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamReadResponse;
@@ -62,19 +63,26 @@ public class TeamService {
   }
 
   // 팀 정보 단일 조회
-  public ApiResponse<TeamReadResponse> getTeamInfo(UUID teamId) {
+  public ApiResponse<TeamReadResponse> getTeamInfo(UUID teamId, UUID userId) {
 
     Team team = getTeamById(teamId);
     long favCnt = favTeamRepository.countByTeam_TeamId(teamId);
-    // 요청자 id로 fav 등록 여부 체크 필요
-    boolean isFav = false; // 임시 데이터
-    TeamInfoResponse teamInfo = TeamInfoResponse.from(team, favCnt, isFav);
-    // 팀 관련 게임 정보 조회 메서드 호출 필요
-    ApiResponse<List<GameReadResponse>> gameResponse = gameServiceClient.getGamesByTeamId(teamId);
-    if (gameResponse.code() != 200) {
-      throw new BusinessException(ErrorCode.GAME_DATA_FETCH_FAILED);
+    boolean isFav;
+    List<GameReadResponse> games;
+
+    if (favTeamRepository.findByUserIdAndTeam_TeamId(userId, teamId).isPresent()) {
+      isFav = true;
+    } else {
+      isFav = false;
     }
-    List<GameReadResponse> games = gameResponse.data();
+    TeamInfoResponse teamInfo = TeamInfoResponse.from(team, favCnt, isFav);
+    ApiResponse<PagedGameResponse> gameResponse = gameServiceClient.getGamesByTeamId(teamId,
+        0, 10);
+    if (gameResponse.code() == 200) {
+      games = gameResponse.data().content();
+    } else {
+      games = null;
+    }
     TeamReadResponse response = new TeamReadResponse(teamInfo, games);
     return new ApiResponse<>(200, "조회 완료", response);
   }

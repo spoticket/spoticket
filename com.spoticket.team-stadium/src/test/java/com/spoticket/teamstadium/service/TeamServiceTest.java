@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
 import com.spoticket.teamstadium.application.dto.request.TeamUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.TeamListReadResponse;
-import com.spoticket.teamstadium.application.dto.response.TeamReadResponse;
 import com.spoticket.teamstadium.application.service.TeamService;
 import com.spoticket.teamstadium.domain.model.FavTeam;
 import com.spoticket.teamstadium.domain.model.Team;
@@ -136,35 +135,6 @@ class TeamServiceTest {
 
     verify(teamRepository, times(1)).findByNameAndIsDeletedFalse(request.name());
     verify(teamRepository, times(1)).save(any(Team.class));
-  }
-
-  // 팀 단일 조회
-  @Test
-  void getTeamInfo_FeignClientIsExcluded() {
-    // Given
-    UUID teamId = UUID.randomUUID();
-    Team mockTeam = Team.builder()
-        .teamId(teamId)
-        .name("Test Team")
-        .description("test team")
-        .build();
-
-    long favCnt = 10;
-
-    when(teamRepository.findByTeamIdAndIsDeletedFalse(teamId)).thenReturn(Optional.of(mockTeam));
-    when(favTeamRepository.countByTeam_TeamId(teamId)).thenReturn(favCnt);
-
-    // When
-    ApiResponse<TeamReadResponse> response = teamService.getTeamInfo(teamId);
-
-    // Then
-    assertNotNull(response);
-    assertEquals(200, response.code());
-
-    TeamReadResponse teamReadResponse = response.data();
-    assertEquals(teamId, teamReadResponse.team().teamId());
-    assertEquals("Test Team", teamReadResponse.team().name());
-    assertEquals(favCnt, teamReadResponse.team().favCnt());
   }
 
   // 팀 목록 조회

@@ -13,16 +13,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/teams")
 @RequiredArgsConstructor
@@ -33,7 +36,9 @@ public class TeamController {
   // 팀 정보 등록
   @PostMapping
   public ApiResponse<Map<String, UUID>> createTeam(
-      @Valid @RequestBody TeamCreateRequest request
+      @Valid @RequestBody TeamCreateRequest request,
+      @RequestHeader("X-User-Id") UUID userId,
+      @RequestHeader("X-Role") String role
   ) {
     return teamService.createTeam(request);
   }
@@ -41,9 +46,10 @@ public class TeamController {
   // 팀 정보 단일 조회
   @GetMapping("/{teamId}")
   public ApiResponse<TeamReadResponse> getTeamInfo(
-      @PathVariable UUID teamId
+      @PathVariable UUID teamId,
+      @RequestHeader("X-User-Id") UUID userId
   ) {
-    return teamService.getTeamInfo(teamId);
+    return teamService.getTeamInfo(teamId, userId);
   }
 
   // 팀 목록 조회
