@@ -120,7 +120,7 @@ public class UserService {
   @Transactional(readOnly = true)
   public SuccessResponse<?> selectUserList(Predicate predicate, Pageable pageable) {
     BooleanBuilder booleanBuilder = new BooleanBuilder(predicate);
-    booleanBuilder.and(user.isDeleted.eq(false));
+    booleanBuilder.and(user.isDelete.eq(false));
 
     Page<User> userList = userRepository.findAll(booleanBuilder, pageable);
 
