@@ -45,6 +45,8 @@ public class Game extends BaseEntity {
 
   private UUID awayTeamId;
 
+  private Long hits;
+
   public static Game of(String title, LocalDateTime startTime, Sport sport, String league,
       UUID stadiumId, UUID homeTeamId, UUID awayTeamId) {
     return Game.builder()
@@ -60,26 +62,31 @@ public class Game extends BaseEntity {
 
   public void update(String title, LocalDateTime startTime, String league, Sport sport,
       UUID stadiumId, UUID homeTeamId, UUID awayTeamId) {
-      if (isNotBlank(title)) {
-          this.title = title;
-      }
-      if (nonNull(startTime)) {
-          this.startTime = startTime;
-      }
-      if (isNotBlank(league)) {
-          this.league = league;
-      }
-      if (nonNull(sport)) {
-          this.sport = sport;
-      }
-      if (nonNull(stadiumId)) {
-          this.stadiumId = stadiumId;
-      }
-      if (nonNull(homeTeamId)) {
-          this.homeTeamId = homeTeamId;
-      }
-    if (nonNull(awayTeamId))
+    if (isNotBlank(title)) {
+      this.title = title;
+    }
+    if (nonNull(startTime)) {
+      this.startTime = startTime;
+    }
+    if (isNotBlank(league)) {
+      this.league = league;
+    }
+    if (nonNull(sport)) {
+      this.sport = sport;
+    }
+    if (nonNull(stadiumId)) {
+      this.stadiumId = stadiumId;
+    }
+    if (nonNull(homeTeamId)) {
+      this.homeTeamId = homeTeamId;
+    }
+    if (nonNull(awayTeamId)) {
       this.awayTeamId = awayTeamId;
+    }
+  }
+
+  public void increaseHit() {
+    hits++;
   }
 
 }
