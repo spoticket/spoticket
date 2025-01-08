@@ -10,9 +10,7 @@ import com.spoticket.ticket.domain.entity.TicketStatus;
 import com.spoticket.ticket.global.exception.BusinessException;
 import com.spoticket.ticket.global.exception.ErrorCode;
 import com.spoticket.ticket.global.util.ApiResponse;
-import com.spoticket.ticket.global.util.PagedApiResponse;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -48,7 +46,7 @@ public class TicketController {
   }
 
   @GetMapping
-  public PagedApiResponse<List<TicketResponse>> getTickets(
+  public ApiResponse<Page<TicketResponse>> getTickets(
       @RequestParam(required = false) UUID userId,
       @RequestParam(required = false) UUID gameId,
       @RequestParam(required = false) UUID seatId,
@@ -65,13 +63,7 @@ public class TicketController {
       throw new BusinessException(ErrorCode.TICKET_NOT_FOUND);
     }
 
-    return PagedApiResponse.success(
-        tickets.getContent(),
-        "조회 성공",
-        page,
-        size,
-        (int) tickets.getTotalElements()
-    );
+    return ApiResponse.success(tickets, "조회 성공");
   }
 
   @PatchMapping("/{ticketId}")
