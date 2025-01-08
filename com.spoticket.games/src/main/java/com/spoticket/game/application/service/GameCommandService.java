@@ -20,15 +20,16 @@ public class GameCommandService {
 
   private final GameJpaRepository gameJpaRepository;
 
-  public GameResponse createGame(CreateGameRequest request) {
+  public GameResponse createGame(UUID userId, CreateGameRequest request) {
     Game game = Game.of(
         request.getTitle(), request.getStartTime(), request.getSport(), request.getLeague(),
         request.getStadiumId(), request.getHomeTeamId(), request.getAwayTeamId()
     );
+    game.setCreatedBy(userId);
     return GameResponse.from(gameJpaRepository.save(game));
   }
 
-  public GameResponse updateGame(UUID gameId, UpdateGameRequest request) {
+  public GameResponse updateGame(UUID userId, UUID gameId, UpdateGameRequest request) {
     Game game = gameJpaRepository.findById(gameId)
         .orElseThrow(() -> new CustomException(NOT_FOUND));
     game.update(
@@ -40,13 +41,14 @@ public class GameCommandService {
         request.getHomeTeamId(),
         request.getAwayTeamId()
     );
+    game.setUpdatedBy(userId);
     return GameResponse.from(game);
   }
 
-  public void deleteGame(UUID gameId) {
+  public void deleteGame(UUID userId, UUID gameId) {
     Game game = gameJpaRepository.findById(gameId)
         .orElseThrow(() -> new CustomException(NOT_FOUND));
-    game.delete();
+    game.delete(userId);
   }
 
 }
