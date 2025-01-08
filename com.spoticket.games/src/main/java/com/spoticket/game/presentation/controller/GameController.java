@@ -1,7 +1,6 @@
 package com.spoticket.game.presentation.controller;
 
 import static com.spoticket.game.global.util.ErrorUtils.validateAndThrowIfInvalid;
-import static com.spoticket.game.global.util.ResponseUtils.BasicResponse;
 import static com.spoticket.game.global.util.ResponseUtils.DataResponse;
 import static com.spoticket.game.global.util.ResponseUtils.created;
 import static com.spoticket.game.global.util.ResponseUtils.noContent;
@@ -66,7 +65,7 @@ public class GameController {
   }
 
   @DeleteMapping("/{gameId}")
-  public BasicResponse deleteGame(@PathVariable UUID gameId) {
+  public DataResponse<Object> deleteGame(@PathVariable UUID gameId) {
     gameCommandService.deleteGame(gameId);
     return noContent();
   }

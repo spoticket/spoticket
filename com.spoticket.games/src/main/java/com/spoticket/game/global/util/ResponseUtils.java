@@ -30,27 +30,20 @@ public class ResponseUtils {
         .build();
   }
 
-  public static BasicResponse noContent() {
-    return BasicResponse.builder()
+  public static <T> DataResponse<T> noContent() {
+    return DataResponse.<T>builder()
         .code(NO_CONTENT.value())
         .msg(NO_CONTENT.getReasonPhrase())
+        .data(null)
         .build();
   }
 
-  public static BasicResponse failed(CustomException e) {
-    return BasicResponse.builder()
+  public static <T> DataResponse<T> failed(CustomException e) {
+    return DataResponse.<T>builder()
         .code(e.getCode())
         .msg(e.getMsg())
+        .data(null)
         .build();
-  }
-
-  @AllArgsConstructor
-  @Getter
-  @Builder
-  public static class BasicResponse {
-
-    private Integer code;
-    private String msg;
   }
 
   @AllArgsConstructor
