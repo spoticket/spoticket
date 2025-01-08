@@ -9,11 +9,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(BusinessException.class)
-  public ResponseEntity<ApiResponse<?>> handleBusinessException(BusinessException ex) {
+  public ApiResponse<?> handleBusinessException(BusinessException ex) {
     ErrorCode errorCode = ex.getErrorCode();
-    return ResponseEntity
-        .status(errorCode.getStatus())
-        .body(ApiResponse.fail(errorCode.getStatus(), errorCode.getMessage()));
+    return ApiResponse.fail(errorCode.getStatus(), errorCode.getMessage());
   }
 
   // 서버 오류
