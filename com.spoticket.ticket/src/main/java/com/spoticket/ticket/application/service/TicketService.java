@@ -4,6 +4,7 @@ import com.spoticket.ticket.application.dtos.request.CreateTicketRequest;
 import com.spoticket.ticket.application.dtos.request.TicketSearchCriteria;
 import com.spoticket.ticket.application.dtos.request.UpdateTicketStatusRequest;
 import com.spoticket.ticket.application.dtos.response.GameResponse;
+import com.spoticket.ticket.application.dtos.response.StadiumReadResponse;
 import com.spoticket.ticket.application.dtos.response.TicketInfoResponse;
 import com.spoticket.ticket.application.dtos.response.TicketResponse;
 import com.spoticket.ticket.domain.entity.Ticket;
@@ -13,6 +14,7 @@ import com.spoticket.ticket.global.exception.BusinessException;
 import com.spoticket.ticket.global.exception.ErrorCode;
 import com.spoticket.ticket.global.util.ApiResponse;
 import com.spoticket.ticket.infrastructure.GameServiceClient;
+import com.spoticket.ticket.infrastructure.StadiumServiceClient;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,7 @@ public class TicketService {
 
   private final TicketRepository ticketRepository;
   private final GameServiceClient gameServiceClient;
+  private final StadiumServiceClient stadiumServiceClient;
 
   @Transactional
   public TicketResponse createTicket(CreateTicketRequest request) {
@@ -39,6 +42,7 @@ public class TicketService {
     Ticket ticket = Ticket.create(
         request.userId(),
         request.gameId(),
+        request.stadiumId(),
         request.seatId(),
         request.seatName()
     );
@@ -53,6 +57,9 @@ public class TicketService {
     // 게임 정보 가져오기
     ApiResponse<GameResponse> gameResponse = gameServiceClient.getGame(ticket.getGameId());
     GameResponse gameData = gameResponse.getData();
+
+    ApiResponse<StadiumReadResponse> stadiumResponse = stadiumServiceClient.getStadiumInfo(
+        ticket.getStadiumId());
 
     return TicketInfoResponse.from(ticket, gameData.title());
   }
