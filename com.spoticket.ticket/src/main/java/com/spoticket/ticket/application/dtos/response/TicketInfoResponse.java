@@ -13,7 +13,6 @@ public record TicketInfoResponse(
     UUID seatId,
     String userName,
     String gameName,
-    String section,
     String seatName,
     String stadiumName,
     TicketStatus status
