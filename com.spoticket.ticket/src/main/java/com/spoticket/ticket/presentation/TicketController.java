@@ -42,7 +42,11 @@ public class TicketController {
 
   @GetMapping("/{ticketId}")
   public ApiResponse<TicketInfoResponse> getTicketById(@PathVariable UUID ticketId) {
+    System.out.println("Requested ticketId = " + ticketId);  // 로그 추가
+
     TicketInfoResponse ticketInfoResponse = ticketService.getTicketById(ticketId);
+
+    System.out.println("ticketInfoResponse = " + ticketInfoResponse);  // 로그 추가
 
     return ApiResponse.success(ticketInfoResponse, "조회 성공");
   }

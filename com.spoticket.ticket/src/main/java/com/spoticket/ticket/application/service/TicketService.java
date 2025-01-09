@@ -3,6 +3,7 @@ package com.spoticket.ticket.application.service;
 import com.spoticket.ticket.application.dtos.request.CreateTicketRequest;
 import com.spoticket.ticket.application.dtos.request.TicketSearchCriteria;
 import com.spoticket.ticket.application.dtos.request.UpdateTicketStatusRequest;
+import com.spoticket.ticket.application.dtos.response.GameResponse;
 import com.spoticket.ticket.application.dtos.response.TicketInfoResponse;
 import com.spoticket.ticket.application.dtos.response.TicketResponse;
 import com.spoticket.ticket.domain.entity.Ticket;
@@ -10,6 +11,8 @@ import com.spoticket.ticket.domain.entity.TicketStatus;
 import com.spoticket.ticket.domain.repository.TicketRepository;
 import com.spoticket.ticket.global.exception.BusinessException;
 import com.spoticket.ticket.global.exception.ErrorCode;
+import com.spoticket.ticket.global.util.ApiResponse;
+import com.spoticket.ticket.infrastructure.GameServiceClient;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TicketService {
 
+
   private final TicketRepository ticketRepository;
+  private final GameServiceClient gameServiceClient;
 
   @Transactional
   public TicketResponse createTicket(CreateTicketRequest request) {
@@ -45,7 +50,11 @@ public class TicketService {
     Ticket ticket = ticketRepository.findById(ticketId)
         .orElseThrow(() -> new BusinessException(ErrorCode.TICKET_NOT_FOUND));
 
-    return TicketInfoResponse.from(ticket);
+    // 게임 정보 가져오기
+    ApiResponse<GameResponse> gameResponse = gameServiceClient.getGame(ticket.getGameId());
+    GameResponse gameData = gameResponse.getData();
+
+    return TicketInfoResponse.from(ticket, gameData.title());
   }
 
   public Page<TicketResponse> getTickets(TicketSearchCriteria criteria) {
