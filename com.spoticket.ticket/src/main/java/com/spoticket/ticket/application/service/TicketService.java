@@ -4,6 +4,7 @@ import com.spoticket.ticket.application.dtos.request.CreateTicketRequest;
 import com.spoticket.ticket.application.dtos.request.TicketSearchCriteria;
 import com.spoticket.ticket.application.dtos.request.UpdateTicketStatusRequest;
 import com.spoticket.ticket.application.dtos.response.GameResponse;
+import com.spoticket.ticket.application.dtos.response.StadiumInfoResponse;
 import com.spoticket.ticket.application.dtos.response.StadiumReadResponse;
 import com.spoticket.ticket.application.dtos.response.TicketInfoResponse;
 import com.spoticket.ticket.application.dtos.response.TicketResponse;
@@ -60,8 +61,9 @@ public class TicketService {
 
     ApiResponse<StadiumReadResponse> stadiumResponse = stadiumServiceClient.getStadiumInfo(
         ticket.getStadiumId());
+    StadiumInfoResponse stadiumData = stadiumResponse.getData().stadium();
 
-    return TicketInfoResponse.from(ticket, gameData.title());
+    return TicketInfoResponse.from(ticket, gameData.title(), stadiumData.name());
   }
 
   public Page<TicketResponse> getTickets(TicketSearchCriteria criteria) {

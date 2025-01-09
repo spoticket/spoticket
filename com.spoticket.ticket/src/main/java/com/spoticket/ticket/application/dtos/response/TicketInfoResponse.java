@@ -18,13 +18,14 @@ public record TicketInfoResponse(
     TicketStatus status
 ) {
 
-  public static TicketInfoResponse from(Ticket ticket, String gameTitle) {
+  public static TicketInfoResponse from(Ticket ticket, String gameTitle, String stadiumName) {
     return TicketInfoResponse.builder()
         .ticketId(ticket.getTicketId())
         .userId(ticket.getUserId())
         .gameId(ticket.getTicketId())
         .seatId(ticket.getSeatId())
         .gameName(gameTitle)
+        .stadiumName(stadiumName)
         .seatName(ticket.getSeatName())
         .status(ticket.getStatus())
         .build();
