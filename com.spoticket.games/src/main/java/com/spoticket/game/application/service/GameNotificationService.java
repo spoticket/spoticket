@@ -34,7 +34,7 @@ public class GameNotificationService {
   private final TicketClient ticketClient;
   private final UserClient userClient;
 
-  @Scheduled(cron = "*/5 * * * * *")
+  @Scheduled(cron = "0 * * * * *")
   public void sendNotificationIfTimeMatches() {
     List<TicketResponse> ticketResponses = getAllBookedTickets();
     for (TicketResponse ticketResponse : ticketResponses) {
