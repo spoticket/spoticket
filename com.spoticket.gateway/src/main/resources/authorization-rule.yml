@@ -24,3 +24,14 @@ authorization:
         - GET
       roles:
         - ROLE_MASTER
+    - path: /api/v1/coupons/**
+      method:
+        - POST
+        - GET
+        - PATCH
+        - PUT
+        - DELETE
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER
