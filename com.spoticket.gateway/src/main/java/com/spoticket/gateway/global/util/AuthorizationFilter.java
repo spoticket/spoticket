@@ -24,10 +24,6 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
       this.config = config;
   }
 
-  public AuthorizationFilter(AuthorizationRulesConfig config) {
-    this.config = config;
-  }
-
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     String path = exchange.getRequest().getURI().getPath();

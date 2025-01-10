@@ -10,9 +10,6 @@ public enum ResponseStatus {
 
     USER_SIGN_UP(HttpStatus.CREATED, "회원가입에 성공했습니다."),
     USER_LOGIN(HttpStatus.OK, "로그인 성공"),
-    USER_ROLE_CHANGED(HttpStatus.NO_CONTENT, "회원 권한이 변경되었습니다."),
-    USER_INFO_UPDATE(HttpStatus.NO_CONTENT, "회원정보가 수정되었습니다."),
-    USER_ROLE_CHANGED(HttpStatus.NO_CONTENT, "회원 권한 변경이 성공하였습니다."),
 
     USER_ROLE_CHANGED(HttpStatus.NO_CONTENT, "회원 권한이 변경되었습니다."),
     USER_INFO_UPDATE(HttpStatus.NO_CONTENT, "회원정보가 수정되었습니다."),
