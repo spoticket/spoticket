@@ -1,8 +1,12 @@
 package com.spoticket.teamstadium.application.service;
 
+import static com.spoticket.teamstadium.domain.model.UserRoleEnum.ROLE_ADMIN;
+import static com.spoticket.teamstadium.domain.model.UserRoleEnum.ROLE_MASTER;
+
 import com.spoticket.teamstadium.application.dto.request.StadiumCreateRequest;
 import com.spoticket.teamstadium.application.dto.request.StadiumUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.GameReadResponse;
+import com.spoticket.teamstadium.application.dto.response.PagedGameResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumInfoResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumListReadResponse;
 import com.spoticket.teamstadium.application.dto.response.StadiumReadResponse;
@@ -14,6 +18,8 @@ import com.spoticket.teamstadium.exception.ErrorCode;
 import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
+import com.spoticket.teamstadium.global.util.RequestUtils;
+import com.spoticket.teamstadium.infrastructure.feign.GameServiceClient;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +39,15 @@ public class StadiumService {
 
   private final StadiumRepository stadiumRepository;
   private final SeatService seatService;
+  private final GameServiceClient gameServiceClient;
 
   @Transactional
   public ApiResponse<Map<String, UUID>> createStadium(StadiumCreateRequest request) {
-    // 요청자 권한 체크
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
 
-    // 경기장 이름 중복 체크
     if (stadiumRepository.findByNameAndIsDeletedFalse(request.name()).isPresent()) {
       throw new BusinessException(ErrorCode.DUPLICATE_STADIUM_NAME);
     }
@@ -64,8 +73,14 @@ public class StadiumService {
 
     Stadium stadium = getStadiumById(stadiumId);
     StadiumInfoResponse stadiumInfo = StadiumInfoResponse.from(stadium);
-    // 경기장 관련 게임 정보 조회 메서드 호출 필요
-    List<GameReadResponse> games = null;
+    List<GameReadResponse> games;
+    ApiResponse<PagedGameResponse> gameResponse = gameServiceClient.getGamesByStadiumId(stadiumId,
+        0, 10);
+    if (gameResponse.code() == 200) {
+      games = gameResponse.data().content();
+    } else {
+      games = null;
+    }
     StadiumReadResponse response = new StadiumReadResponse(stadiumInfo, games);
     return new ApiResponse<>(200, "조회 완료", response);
   }
@@ -85,7 +100,10 @@ public class StadiumService {
       UUID stadiumId,
       StadiumUpdateRequest request
   ) {
-    // 요청자 권한 체크
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
 
     Stadium stadium = getStadiumById(stadiumId);
     if (request.name() != null &&
@@ -108,7 +126,10 @@ public class StadiumService {
 
   // 경기장 삭제
   public ApiResponse<Void> deleteStadium(UUID stadiumId) {
-    // 요청자 권한 체크
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
 
     Stadium stadium = getStadiumById(stadiumId);
 

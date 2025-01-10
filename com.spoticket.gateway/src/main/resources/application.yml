@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: gateway
+
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      routes:
+        - id: user
+          uri: lb://user
+          predicates:
+            - Path=/api/v1/users/**, /api/v1/coupons/**
+
+        - id: team-stadium
+          uri: lb://team-stadium
+          predicates:
+            - Path=/api/v1/teams/**, /api/v1/stadiums/**
+
+        - id: game
+          uri: lb://game
+          predicates:
+            - Path=/api/v1/games/**
+
+        - id: payment
+          uri: lb://payment
+          predicates:
+            - Path=/api/v1/payments/**, /api/v1/orders/**
+
+        - id: ticket
+          uri: lb://ticket
+          predicates:
+            - Path=/api/v1/tickets/**
+
+      discovery:
+        locator:
+          enabled: true
+
+  # Authorization Rules
+  config:
+    import:
+      - authorization-rule.yml
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+
+service:
+  jwt:
+    secret-key: "67mE67CA7J6F64uI64ukIOuLpOuTpCDsp4DsvJzso7zshLjsmpQ="

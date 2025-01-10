@@ -45,8 +45,10 @@ public class GameController {
   }
 
   @GetMapping
-  public DataResponse<PagedModel<GameResponse>> getGames(SearchCondition condition,
-      Pageable pageable) {
+  public DataResponse<PagedModel<GameResponse>> getGames(
+      SearchCondition condition,
+      Pageable pageable
+  ) {
     condition.setPageable(pageable);
     return ok(gameQueryService.getGames(condition));
   }

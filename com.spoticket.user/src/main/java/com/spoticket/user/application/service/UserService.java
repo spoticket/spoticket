@@ -1,9 +1,5 @@
 package com.spoticket.user.application.service;
 
-import static com.spoticket.user.domain.model.entity.QUser.user;
-import static com.spoticket.user.global.exception.ErrorStatus.USER_DUPLICATE;
-import static com.spoticket.user.global.util.ResponseStatus.USER_ROLE_CHANGED;
-
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.spoticket.user.domain.model.UserRole;
@@ -12,13 +8,13 @@ import com.spoticket.user.domain.repository.UserRepository;
 import com.spoticket.user.dto.request.UserLoginRequestDto;
 import com.spoticket.user.dto.request.UserRoleChangeRequestDto;
 import com.spoticket.user.dto.request.UserSignupRequestDto;
+import com.spoticket.user.dto.request.UserUpdateRequestDto;
 import com.spoticket.user.dto.response.UserResponseDto;
 import com.spoticket.user.global.exception.CustomException;
 import com.spoticket.user.global.exception.ErrorStatus;
 import com.spoticket.user.global.util.JwtUtil;
 import com.spoticket.user.global.util.ResponseStatus;
 import com.spoticket.user.global.util.SuccessResponse;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,117 +23,158 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
+import static com.spoticket.user.domain.model.entity.QUser.user;
+import static com.spoticket.user.global.util.ResponseStatus.*;
+import static com.spoticket.user.global.util.ResponseStatus.USER_INFO_UPDATE;
+import static com.spoticket.user.global.exception.ErrorStatus.USER_DUPLICATE;
+import static com.spoticket.user.global.util.ResponseStatus.USER_ROLE_CHANGED;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
 
-  private final UserRepository userRepository;
-  private final PasswordEncoder passwordEncoder;
-  private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-  @Transactional
-  public SuccessResponse<?> createUser(UserSignupRequestDto request) {
+    @Transactional
+    public SuccessResponse<?> createUser(UserSignupRequestDto request) {
 
-    if (userRepository.findByEmail(request.email()).isPresent()) {
-      throw new CustomException(USER_DUPLICATE);
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            throw new CustomException(USER_DUPLICATE);
+        }
+
+        User user = User.of(
+                request.email(),
+                passwordEncoder.encode(request.password()),
+                request.slackId(),
+                UserRole.ROLE_USER,
+                request.name(),
+                request.gender(),
+                request.birthday(),
+                request.post(),
+                request.address(),
+                request.addressDetail()
+        );
+        userRepository.save(user);
+
+        return SuccessResponse.of(ResponseStatus.USER_SIGN_UP);
     }
 
-    User user = User.of(
-        request.email(),
-        passwordEncoder.encode(request.password()),
-        request.slackId(),
-        UserRole.ROLE_USER,
-        request.name(),
-        request.gender(),
-        request.birthday(),
-        request.post(),
-        request.address(),
-        request.addressDetail()
-    );
-    userRepository.save(user);
+    public SuccessResponse<?> login(UserLoginRequestDto request) {
 
-    return SuccessResponse.of(ResponseStatus.USER_SIGN_UP);
-  }
+        User user = userRepository.findByEmail(request.email()).orElseThrow(
+                () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
+        );
 
-  public SuccessResponse<?> login(UserLoginRequestDto request) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new CustomException(ErrorStatus.USER_NOT_FOUND);
+        }
 
-    User user = userRepository.findByEmail(request.email()).orElseThrow(
-        () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
-    );
+        String token = jwtUtil.createAccessToken(user.getUserId(), user.getRole());
 
-    if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-      throw new CustomException(ErrorStatus.USER_NOT_FOUND);
+        return SuccessResponse.of(ResponseStatus.USER_LOGIN, token);
     }
 
-    String token = jwtUtil.createAccessToken(user.getUserId(), user.getRole());
+    @Transactional
+    public SuccessResponse<?> changeRole(UUID currentUserId, String role, UserRoleChangeRequestDto request, UUID targetUserId) {
 
-    return SuccessResponse.of(ResponseStatus.USER_LOGIN, token);
-  }
+        // 자기 자신이 아니거나 마스터가 아닐 경우 throw
+        if (!role.equals(UserRole.ROLE_MASTER.toString())) {
+            if (!currentUserId.equals(targetUserId)) {
+                throw new CustomException(ErrorStatus.FORBIDDEN);
+            }
+        }
 
-  @Transactional
-  public SuccessResponse<?> changeRole(UUID currentUserId, String role,
-      UserRoleChangeRequestDto request, UUID targetUserId) {
+        User user = userRepository.findById(targetUserId).orElseThrow(
+                () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
+        );
 
-    // 자기 자신이 아니거나 마스터가 아닐 경우 throw
-    if (!role.equals(UserRole.ROLE_MASTER.toString())) {
-      if (!currentUserId.equals(targetUserId)) {
-        throw new CustomException(ErrorStatus.FORBIDDEN);
-      }
+        user.roleChange(UserRole.valueOf(request.role()));
+
+        return SuccessResponse.of(USER_ROLE_CHANGED);
     }
 
-    User user = userRepository.findById(targetUserId).orElseThrow(
-        () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
-    );
+    @Transactional(readOnly = true)
+    public SuccessResponse<?> selectUserById(UUID userId) {
 
-    user.roleChange(UserRole.valueOf(request.role()));
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
+        );
 
-    return SuccessResponse.of(USER_ROLE_CHANGED);
-  }
+        UserResponseDto response = new UserResponseDto(
+                user.getUserId(),
+                user.getEmail(),
+                user.getName(),
+                user.getGender(),
+                user.getBirthday(),
+                user.getPost(),
+                user.getAddress(),
+                user.getAddressDetail(),
+                user.getSlackId()
+        );
 
-  @Transactional(readOnly = true)
-  public SuccessResponse<?> selectUserById(UUID userId) {
+        return SuccessResponse.ok(response);
+    }
 
-    User user = userRepository.findById(userId).orElseThrow(
-        () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
-    );
+    @Transactional(readOnly = true)
+    public SuccessResponse<?> selectUserList(Predicate predicate, Pageable pageable) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder(predicate);
+        booleanBuilder.and(user.isDeleted.eq(false));
 
-    UserResponseDto response = new UserResponseDto(
-        user.getUserId(),
-        user.getEmail(),
-        user.getName(),
-        user.getGender(),
-        user.getBirthday(),
-        user.getPost(),
-        user.getAddress(),
-        user.getAddressDetail(),
-        user.getSlackId()
-    );
+        Page<User> userList = userRepository.findAll(booleanBuilder, pageable);
 
-    return SuccessResponse.ok(response);
-  }
+        return SuccessResponse.ok(toUserResponseDtoPage(userList));
+    }
 
-  @Transactional(readOnly = true)
-  public SuccessResponse<?> selectUserList(Predicate predicate, Pageable pageable) {
-    BooleanBuilder booleanBuilder = new BooleanBuilder(predicate);
-    booleanBuilder.and(user.isDeleted.eq(false));
+    public Page<UserResponseDto> toUserResponseDtoPage(Page<User> userPage) {
+        return userPage.map(user -> new UserResponseDto(
+                user.getUserId(),
+                user.getEmail(),
+                user.getName(),
+                user.getGender(),
+                user.getBirthday(),
+                user.getPost(),
+                user.getAddress(),
+                user.getAddressDetail(),
+                user.getSlackId()
+        ));
+    }
 
-    Page<User> userList = userRepository.findAll(booleanBuilder, pageable);
+    @Transactional
+    public SuccessResponse<?> update(UUID userId, UserUpdateRequestDto request) {
 
-    return SuccessResponse.ok(toUserResponseDtoPage(userList));
-  }
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
+        );
 
-  public Page<UserResponseDto> toUserResponseDtoPage(Page<User> userPage) {
-    return userPage.map(user -> new UserResponseDto(
-        user.getUserId(),
-        user.getEmail(),
-        user.getName(),
-        user.getGender(),
-        user.getBirthday(),
-        user.getPost(),
-        user.getAddress(),
-        user.getAddressDetail(),
-        user.getSlackId()
-    ));
-  }
+        user.update(
+                request.email(),
+                !request.password().isEmpty() ? passwordEncoder.encode(request.password()) : request.password(),
+                request.slackId(),
+                request.name(),
+                request.gender(),
+                request.birthday(),
+                request.post(),
+                request.address(),
+                request.addressDetail()
+        );
+
+        return SuccessResponse.ok(USER_INFO_UPDATE);
+    }
+
+    @Transactional
+    public SuccessResponse<?> delete(UUID userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
+        );
+
+        user.delete(UUID.fromString("SYSTEM"));
+
+        return SuccessResponse.ok(USER_DELETE);
+    }
 }

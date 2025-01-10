@@ -37,4 +37,11 @@ public class UserCoupon extends BaseEntity {
     public void expiry() {
         this.status = "EXPIRED";
     }
+
+    public static UserCoupon of(User user, Coupon coupon){
+        return UserCoupon.builder()
+                .user(user)
+                .coupon(coupon)
+                .build();
+    }
 }

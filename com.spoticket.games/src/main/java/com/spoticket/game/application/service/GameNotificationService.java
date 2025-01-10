@@ -34,7 +34,7 @@ public class GameNotificationService {
   private final TicketClient ticketClient;
   private final UserClient userClient;
 
-  @Scheduled(cron = "0 * * * * *")
+  @Scheduled(cron = "*/5 * * * * *")
   public void sendNotificationIfTimeMatches() {
     List<TicketResponse> ticketResponses = getAllBookedTickets();
     for (TicketResponse ticketResponse : ticketResponses) {
@@ -62,7 +62,7 @@ public class GameNotificationService {
 
   private List<TicketResponse> getAllBookedTickets() {
     return ticketClient
-        .getTickets(null, null, null, null, TicketStatus.BOOKED, 0, Integer.MAX_VALUE)
+        .getTickets(TicketStatus.BOOKED, Integer.MAX_VALUE)
         .getData()
         .stream()
         .toList();

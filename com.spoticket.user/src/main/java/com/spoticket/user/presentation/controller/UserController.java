@@ -6,6 +6,7 @@ import com.spoticket.user.domain.model.entity.User;
 import com.spoticket.user.dto.request.UserLoginRequestDto;
 import com.spoticket.user.dto.request.UserRoleChangeRequestDto;
 import com.spoticket.user.dto.request.UserSignupRequestDto;
+import com.spoticket.user.dto.request.UserUpdateRequestDto;
 import com.spoticket.user.global.util.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(
-            @RequestBody(required = false) UserSignupRequestDto request
+            @RequestBody UserSignupRequestDto request
     ) {
         return ResponseEntity.ok().body(userService.createUser(request));
     }
@@ -77,5 +78,21 @@ public class UserController {
     ){
         return ResponseEntity.ok()
                 .body(userService.selectUserList(predicate, pageable));
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> update(
+            @RequestBody UserUpdateRequestDto request,
+            @PathVariable UUID userId
+    ){
+        return ResponseEntity.ok()
+                .body(userService.update(userId, request));
+    }
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<?> delete(
+            @PathVariable UUID userId
+    ){
+        return ResponseEntity.ok()
+                .body(userService.delete(userId));
     }
 }
