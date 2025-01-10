@@ -1,5 +1,8 @@
 package com.spoticket.teamstadium.application.service;
 
+import static com.spoticket.teamstadium.domain.model.UserRoleEnum.ROLE_ADMIN;
+import static com.spoticket.teamstadium.domain.model.UserRoleEnum.ROLE_MASTER;
+
 import com.spoticket.teamstadium.application.dto.request.SeatCreateRequest;
 import com.spoticket.teamstadium.application.dto.request.SeatUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.SeatListReadResponse;
@@ -11,6 +14,7 @@ import com.spoticket.teamstadium.exception.BusinessException;
 import com.spoticket.teamstadium.exception.ErrorCode;
 import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
+import com.spoticket.teamstadium.global.util.RequestUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,10 +41,11 @@ public class SeatService {
       UUID stadiumId,
       SeatCreateRequest request
   ) {
-    // 요청자 권한 체크
-
-    // 게임 유효성 체크
-
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
+    
     if (seatRepository.findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
         request.section(), request.gameId(), stadiumId).isPresent()
     ) {
@@ -97,7 +102,10 @@ public class SeatService {
       UUID seatId,
       SeatUpdateRequest request
   ) {
-    // 요청자 권한 확인
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
 
     Seat seat = getSeatById(seatId);
     UUID stadiumId = seat.getStadium().getStadiumId();
@@ -118,7 +126,11 @@ public class SeatService {
   @Transactional
   public ApiResponse<Void> deleteSeat(UUID seatId) {
 
-    // 요청자 권한 확인
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
+
     Seat seat = getSeatById(seatId);
     seat.deleteBase();
     seatRepository.save(seat);

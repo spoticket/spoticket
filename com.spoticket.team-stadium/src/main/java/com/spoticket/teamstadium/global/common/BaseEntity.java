@@ -1,5 +1,6 @@
 package com.spoticket.teamstadium.global.common;
 
+import com.spoticket.teamstadium.global.util.RequestUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -46,21 +47,21 @@ public abstract class BaseEntity {
   @PrePersist
   public void createBase() {
     this.createdAt = LocalDateTime.now();
-    this.createdBy = UUID.randomUUID(); // 임시데이터
+    this.createdBy = RequestUtils.getCurrentUserId();
   }
 
   // 수정
   @PreUpdate
   public void updateBase() {
     this.updatedAt = LocalDateTime.now();
-    this.updatedBy = UUID.randomUUID(); // 임시데이터
+    this.updatedBy = RequestUtils.getCurrentUserId();
   }
 
   // 삭제
   public void deleteBase() {
     this.isDeleted = true;
     this.deletedAt = LocalDateTime.now();
-    this.deletedBy = UUID.randomUUID(); // 임시데이터
+    this.deletedBy = RequestUtils.getCurrentUserId();
   }
 
 }

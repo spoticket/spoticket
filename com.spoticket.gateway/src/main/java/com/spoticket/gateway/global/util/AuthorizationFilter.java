@@ -21,6 +21,10 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
   private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
   public AuthorizationFilter(AuthorizationRulesConfig config) {
+      this.config = config;
+  }
+
+  public AuthorizationFilter(AuthorizationRulesConfig config) {
     this.config = config;
   }
 
