@@ -7,6 +7,7 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +18,7 @@ import static com.spoticket.gateway.global.exception.ErrorStatus.FORBIDDEN;
 public class AuthorizationFilter implements GlobalFilter, Ordered {
 
     private final AuthorizationRulesConfig config;
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     public AuthorizationFilter(AuthorizationRulesConfig config) {
         this.config = config;
@@ -52,7 +54,7 @@ public class AuthorizationFilter implements GlobalFilter, Ordered {
     }
 
     private boolean pathMatches(String requestPath, String rulePath) {
-        return requestPath.startsWith(rulePath.replace("**", ""));
+        return antPathMatcher.match(rulePath, requestPath);
     }
 
     @Override
