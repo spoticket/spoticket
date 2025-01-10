@@ -1,8 +1,12 @@
 package com.spoticket.teamstadium.application.service;
 
+import static com.spoticket.teamstadium.domain.model.UserRoleEnum.ROLE_ADMIN;
+import static com.spoticket.teamstadium.domain.model.UserRoleEnum.ROLE_MASTER;
+
 import com.spoticket.teamstadium.application.dto.request.TeamCreateRequest;
 import com.spoticket.teamstadium.application.dto.request.TeamUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.GameReadResponse;
+import com.spoticket.teamstadium.application.dto.response.PagedGameResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamInfoResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamListReadResponse;
 import com.spoticket.teamstadium.application.dto.response.TeamReadResponse;
@@ -16,6 +20,8 @@ import com.spoticket.teamstadium.exception.ErrorCode;
 import com.spoticket.teamstadium.exception.NotFoundException;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
+import com.spoticket.teamstadium.global.util.RequestUtils;
+import com.spoticket.teamstadium.infrastructure.feign.GameServiceClient;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +38,17 @@ public class TeamService {
 
   private final TeamRepository teamRepository;
   private final FavTeamRepository favTeamRepository;
-  //  private final GameServiceClient gameServiceClient;
+  private final GameServiceClient gameServiceClient;
 
   // 팀 정보 등록
   @Transactional
   public ApiResponse<Map<String, UUID>> createTeam(TeamCreateRequest request) {
 
-    // 요청자 권한 체크
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
 
-    // 팀명 중복 체크
     if (teamRepository.findByNameAndIsDeletedFalse(request.name()).isPresent()) {
       throw new BusinessException(ErrorCode.DUPLICATE_TEAM_NAME);
     }
@@ -65,16 +73,23 @@ public class TeamService {
 
     Team team = getTeamById(teamId);
     long favCnt = favTeamRepository.countByTeam_TeamId(teamId);
-    // 요청자 id로 fav 등록 여부 체크 필요
-    boolean isFav = false; // 임시 데이터
+    boolean isFav;
+    List<GameReadResponse> games;
+    UUID userId = RequestUtils.getCurrentUserId();
+
+    if (favTeamRepository.findByUserIdAndTeam_TeamId(userId, teamId).isPresent()) {
+      isFav = true;
+    } else {
+      isFav = false;
+    }
     TeamInfoResponse teamInfo = TeamInfoResponse.from(team, favCnt, isFav);
-    // 팀 관련 게임 정보 조회 메서드 호출 필요
-//    ApiResponse<List<GameReadResponse>> gameResponse = gameServiceClient.getGamesByTeamId(teamId);
-//    if (gameResponse.code() != 200) {
-//      throw new BusinessException(ErrorCode.GAME_DATA_FETCH_FAILED);
-//    }
-//    List<GameReadResponse> games = gameResponse.data();
-    List<GameReadResponse> games = null;
+    ApiResponse<PagedGameResponse> gameResponse = gameServiceClient.getGamesByTeamId(teamId,
+        0, 10);
+    if (gameResponse.code() == 200) {
+      games = gameResponse.data().content();
+    } else {
+      games = null;
+    }
     TeamReadResponse response = new TeamReadResponse(teamInfo, games);
     return new ApiResponse<>(200, "조회 완료", response);
   }
@@ -93,7 +108,6 @@ public class TeamService {
     } else if (category != null) {
       teams = teamRepository.findAllByCategoryAndIsDeletedFalse(category, pageable);
     } else {
-      // 전체 조회
       teams = teamRepository.findAllByIsDeletedFalse(pageable);
     }
 
@@ -107,7 +121,10 @@ public class TeamService {
       UUID teamId,
       TeamUpdateRequest request
   ) {
-    // 요청자 권한 체크 필요
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
 
     Team team = getTeamById(teamId);
     if (request.name() != null &&
@@ -128,7 +145,10 @@ public class TeamService {
   // 팀 정보 삭제
   @Transactional
   public ApiResponse<Void> deleteTeam(UUID teamId) {
-    // 요청자 권한 체크 필요
+    if (RequestUtils.getCurrentUserRole() != ROLE_MASTER
+        && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
+      throw new BusinessException(ErrorCode.FORBIDDEN);
+    }
 
     Team team = getTeamById(teamId);
 
@@ -144,8 +164,7 @@ public class TeamService {
   // 관심 팀 추가/삭제
   @Transactional
   public ApiResponse<Void> favTeam(UUID teamId) {
-    // 요청자 id 추출 필요
-    UUID userId = UUID.fromString("6844ee91-b725-4606-b06a-df7c7a58e452");// 임시값
+    UUID userId = RequestUtils.getCurrentUserId();
     Team team = getTeamById(teamId);
     boolean isAdded;
 

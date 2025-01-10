@@ -8,11 +8,13 @@ import com.spoticket.teamstadium.application.service.TeamService;
 import com.spoticket.teamstadium.domain.model.TeamCategoryEnum;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import com.spoticket.teamstadium.global.dto.PaginatedResponse;
+import com.spoticket.teamstadium.global.util.RequestUtils;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,8 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
-@RequestMapping("/teams")
+@RequestMapping("/api/v1/teams")
 @RequiredArgsConstructor
 public class TeamController {
 
@@ -53,9 +56,8 @@ public class TeamController {
       @RequestParam(required = false) Boolean fav,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size
-//      @RequestHeader(name = "userId", required = false) UUID userId
   ) {
-    UUID userId = UUID.fromString("6844ee91-b725-4606-b06a-df7c7a58e452"); // 임시값
+    UUID userId = RequestUtils.getCurrentUserId();
     PaginatedResponse<TeamListReadResponse> response = teamService
         .getTeams(category, fav, userId, page, size);
     return new ApiResponse<>(200, "조회 완료", response);
