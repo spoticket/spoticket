@@ -31,6 +31,8 @@ public class Ticket extends BaseEntity {
 
   private UUID gameId;
 
+  private UUID stadiumId;
+
   private UUID seatId;
 
   private String seatName;
@@ -38,10 +40,12 @@ public class Ticket extends BaseEntity {
   @Enumerated(value = EnumType.STRING)
   private TicketStatus status;
 
-  public static Ticket create(UUID userId, UUID gameId, UUID seatId, String seatName) {
+  public static Ticket create(UUID userId, UUID gameId, UUID stadiumId, UUID seatId,
+      String seatName) {
     return Ticket.builder()
         .userId(userId)
         .gameId(gameId)
+        .stadiumId(stadiumId)
         .seatId(seatId)
         .seatName(seatName)
         .status(TicketStatus.PICKED)
@@ -51,5 +55,5 @@ public class Ticket extends BaseEntity {
   public void update(TicketStatus status) {
     this.status = status;
   }
-  
+
 }

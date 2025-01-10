@@ -10,6 +10,7 @@ public record TicketResponse(
     UUID ticketId,
     UUID userId,
     UUID gameId,
+    UUID stadiumId,
     UUID seatId,
     String seatName,
     TicketStatus status
@@ -20,6 +21,7 @@ public record TicketResponse(
         .ticketId(ticket.getTicketId())
         .userId(ticket.getUserId())
         .gameId(ticket.getGameId())
+        .stadiumId(ticket.getStadiumId())
         .seatId(ticket.getSeatId())
         .seatName(ticket.getSeatName())
         .status(ticket.getStatus())
