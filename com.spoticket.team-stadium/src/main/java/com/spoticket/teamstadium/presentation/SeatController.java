@@ -3,6 +3,7 @@ package com.spoticket.teamstadium.presentation;
 import com.spoticket.teamstadium.application.dto.request.SeatCreateRequest;
 import com.spoticket.teamstadium.application.dto.request.SeatUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.SeatListReadResponse;
+import com.spoticket.teamstadium.application.dto.response.SeatReadResponse;
 import com.spoticket.teamstadium.application.service.SeatService;
 import com.spoticket.teamstadium.global.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("ap1/v1/stadiums/seats")
+@RequestMapping("api/v1/stadiums/seats")
 @RequiredArgsConstructor
 public class SeatController {
 
@@ -42,6 +43,14 @@ public class SeatController {
       @PathVariable UUID gameId
   ) {
     return seatService.getSeatList(stadiumId, gameId);
+  }
+
+  // 좌석 단일 상세 조회
+  @GetMapping("/{seatId}")
+  public ApiResponse<SeatReadResponse> getSeat(
+      @PathVariable UUID seatId
+  ) {
+    return seatService.getSeat(seatId);
   }
 
   // 좌석 정보 수정

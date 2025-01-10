@@ -24,7 +24,8 @@ authorization:
         - GET
       roles:
         - ROLE_MASTER
-    - path: /api/v1/coupons/**
+    ###### teamstadium ######
+    - path: /api/v1/teams/**
       method:
         - POST
         - GET
@@ -35,3 +36,16 @@ authorization:
         - ROLE_MASTER
         - ROLE_ADMIN
         - ROLE_USER
+        - PUBLIC
+    - path: /api/v1/stadiums/**
+      method:
+        - POST
+        - GET
+        - PATCH
+        - PUT
+        - DELETE
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER
+        - PUBLIC
