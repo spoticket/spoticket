@@ -6,6 +6,7 @@ import static com.spoticket.teamstadium.domain.model.UserRoleEnum.ROLE_MASTER;
 import com.spoticket.teamstadium.application.dto.request.SeatCreateRequest;
 import com.spoticket.teamstadium.application.dto.request.SeatUpdateRequest;
 import com.spoticket.teamstadium.application.dto.response.SeatListReadResponse;
+import com.spoticket.teamstadium.application.dto.response.SeatReadResponse;
 import com.spoticket.teamstadium.domain.model.Seat;
 import com.spoticket.teamstadium.domain.model.Stadium;
 import com.spoticket.teamstadium.domain.repository.SeatRepository;
@@ -45,7 +46,7 @@ public class SeatService {
         && RequestUtils.getCurrentUserRole() != ROLE_ADMIN) {
       throw new BusinessException(ErrorCode.FORBIDDEN);
     }
-    
+
     if (seatRepository.findBySectionAndGameIdAndStadium_StadiumIdAndIsDeletedFalse(
         request.section(), request.gameId(), stadiumId).isPresent()
     ) {
@@ -89,6 +90,14 @@ public class SeatService {
         .map(SeatListReadResponse::from)
         .toList();
 
+    return new ApiResponse<>(200, "조회 완료", response);
+  }
+
+  // 좌석 단일 상세 조회
+  @Transactional(readOnly = true)
+  public ApiResponse<SeatReadResponse> getSeat(UUID seatId) {
+    Seat seat = getSeatById(seatId);
+    SeatReadResponse response = SeatReadResponse.from(seat);
     return new ApiResponse<>(200, "조회 완료", response);
   }
 
@@ -157,4 +166,5 @@ public class SeatService {
     }
     return stadium;
   }
+
 }
