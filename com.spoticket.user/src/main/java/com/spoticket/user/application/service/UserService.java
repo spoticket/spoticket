@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import static com.spoticket.user.domain.model.entity.QUser.user;
 import static com.spoticket.user.global.util.ResponseStatus.*;
+import static com.spoticket.user.global.util.ResponseStatus.USER_INFO_UPDATE;
 import static com.spoticket.user.global.exception.ErrorStatus.USER_DUPLICATE;
 import static com.spoticket.user.global.util.ResponseStatus.USER_ROLE_CHANGED;
 

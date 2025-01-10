@@ -88,7 +88,6 @@ public class UserController {
         return ResponseEntity.ok()
                 .body(userService.update(userId, request));
     }
-
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> delete(
             @PathVariable UUID userId

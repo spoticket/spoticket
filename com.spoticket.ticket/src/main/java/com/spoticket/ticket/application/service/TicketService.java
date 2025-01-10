@@ -1,6 +1,7 @@
 package com.spoticket.ticket.application.service;
 
 import com.spoticket.ticket.application.dtos.request.CreateTicketRequest;
+import com.spoticket.ticket.application.dtos.request.TicketSearchCriteria;
 import com.spoticket.ticket.application.dtos.request.UpdateTicketStatusRequest;
 import com.spoticket.ticket.application.dtos.response.TicketInfoResponse;
 import com.spoticket.ticket.application.dtos.response.TicketResponse;
@@ -11,6 +12,7 @@ import com.spoticket.ticket.global.exception.BusinessException;
 import com.spoticket.ticket.global.exception.ErrorCode;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,11 @@ public class TicketService {
     return TicketInfoResponse.from(ticket);
   }
 
+  public Page<TicketResponse> getTickets(TicketSearchCriteria criteria) {
+    Page<Ticket> tickets = ticketRepository.findAllByCriteria(criteria);
+    return tickets.map(TicketResponse::from);
+  }
+
   @Transactional
   public TicketResponse updateTicketStatus(UUID ticketId, UpdateTicketStatusRequest request) {
     Ticket ticket = ticketRepository.findById(ticketId)
@@ -65,4 +72,6 @@ public class TicketService {
 
     return TicketResponse.from(ticket);
   }
+
+
 }
