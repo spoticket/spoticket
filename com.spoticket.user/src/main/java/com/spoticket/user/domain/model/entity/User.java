@@ -16,7 +16,7 @@ import static io.micrometer.common.util.StringUtils.isNotBlank;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "p_users")
+@Table(name = "p_users", schema = "user_service")
 @Builder
 public class User extends BaseEntity {
 

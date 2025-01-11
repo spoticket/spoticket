@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "p_users_coupons")
+@Table(name = "p_users_coupons", schema = "user_service")
 @Builder
 public class UserCoupon extends BaseEntity {
 
