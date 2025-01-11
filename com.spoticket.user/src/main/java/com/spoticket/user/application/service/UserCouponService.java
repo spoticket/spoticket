@@ -35,7 +35,7 @@ public class UserCouponService {
                 () -> new CustomException(COUPON_NOT_FOUND)
         );
 
-        if (!coupon.getIsAble() || coupon.getStock() > 0) {
+        if (!coupon.getIsAble() || coupon.getStock() <= 0) {
             throw new CustomException(COUPON_ENABLE);
         }
 
@@ -44,6 +44,7 @@ public class UserCouponService {
         );
 
         UserCoupon userCoupon = UserCoupon.of(user, coupon);
+        userCoupon.getCoupon().issue();
 
         userCouponRepository.save(userCoupon);
 
