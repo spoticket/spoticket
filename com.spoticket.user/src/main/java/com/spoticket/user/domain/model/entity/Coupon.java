@@ -14,7 +14,7 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "p_coupons")
+@Table(name = "p_coupons", schema = "user_service")
 @Builder
 public class Coupon extends BaseEntity {
 
@@ -30,7 +30,7 @@ public class Coupon extends BaseEntity {
     private Long stock;
     private Boolean isActive;
 
-    public static Coupon of(String name, Date expirationAt, Boolean isAble, String type, Double discountRate, Long stock, Boolean isActive){
+    public static Coupon of(String name, Date expirationAt, Boolean isAble, String type, Double discountRate, Long stock, Boolean isActive) {
         return Coupon.builder()
                 .name(name)
                 .expirationAt(expirationAt)
@@ -42,7 +42,7 @@ public class Coupon extends BaseEntity {
                 .build();
     }
 
-    public void update(String name, Date expirationAt, Boolean isAble, String type, Double discountRate, Long stock, Boolean isActive){
+    public void update(String name, Date expirationAt, Boolean isAble, String type, Double discountRate, Long stock, Boolean isActive) {
         if (isNotBlank(name)) this.name = name;
         if (nonNull(expirationAt)) this.expirationAt = expirationAt;
         if (isAble != null) this.isAble = isAble;
@@ -50,5 +50,11 @@ public class Coupon extends BaseEntity {
         if (nonNull(discountRate)) this.discountRate = discountRate;
         if (nonNull(stock)) this.stock = stock;
         if (nonNull(isActive)) this.isActive = isActive;
+    }
+
+    public void issue() {
+        this.stock -= 1;
+
+        if (this.stock <= 0) this.isAble = false;
     }
 }
