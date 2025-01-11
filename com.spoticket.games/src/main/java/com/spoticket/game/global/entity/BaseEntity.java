@@ -5,6 +5,7 @@ import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -21,12 +22,14 @@ public class BaseEntity {
   @CreatedDate
   private LocalDateTime createdAt;
 
+  @Setter
   @CreatedBy
   private UUID createdBy;
 
   @LastModifiedDate
   private LocalDateTime updatedAt;
 
+  @Setter
   @LastModifiedBy
   private UUID updatedBy;
 
@@ -34,9 +37,10 @@ public class BaseEntity {
 
   private UUID deletedBy;
 
-  public void delete() {
+  public void delete(UUID userId) {
     isDeleted = true;
     deletedAt = LocalDateTime.now();
+    deletedBy = userId;
   }
 
 }

@@ -49,3 +49,15 @@ authorization:
         - ROLE_ADMIN
         - ROLE_USER
         - PUBLIC
+    ##### game #####
+    - path: /api/v1/games/**
+      method:
+        - POST
+        - GET
+        - PATCH
+        - PUT
+        - DELETE
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER

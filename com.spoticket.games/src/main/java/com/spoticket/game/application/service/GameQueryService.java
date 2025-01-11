@@ -22,9 +22,11 @@ public class GameQueryService {
   private final GameJpaRepository gameJpaRepository;
   private final GameQueryRepository gameQueryRepository;
 
+  @Transactional
   public GameResponse getGame(UUID gameId) {
     Game game = gameJpaRepository.findByGameIdAndIsDeletedFalse(gameId)
         .orElseThrow(() -> new CustomException(NOT_FOUND));
+    game.increaseHit();
     return GameResponse.from(game);
   }
 

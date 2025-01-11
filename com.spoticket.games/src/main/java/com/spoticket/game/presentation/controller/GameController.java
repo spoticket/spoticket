@@ -1,7 +1,6 @@
 package com.spoticket.game.presentation.controller;
 
 import static com.spoticket.game.global.util.ErrorUtils.validateAndThrowIfInvalid;
-import static com.spoticket.game.global.util.ResponseUtils.BasicResponse;
 import static com.spoticket.game.global.util.ResponseUtils.DataResponse;
 import static com.spoticket.game.global.util.ResponseUtils.created;
 import static com.spoticket.game.global.util.ResponseUtils.noContent;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,6 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/games")
 @RequiredArgsConstructor
 public class GameController {
+
+  public static final String HEADER_USER_ID = "X-User-Id";
 
   private final GameCommandService gameCommandService;
   private final GameQueryService gameQueryService;
@@ -43,8 +45,10 @@ public class GameController {
   }
 
   @GetMapping
-  public DataResponse<PagedModel<GameResponse>> getGames(SearchCondition condition,
-      Pageable pageable) {
+  public DataResponse<PagedModel<GameResponse>> getGames(
+      SearchCondition condition,
+      Pageable pageable
+  ) {
     condition.setPageable(pageable);
     return ok(gameQueryService.getGames(condition));
   }
@@ -52,22 +56,27 @@ public class GameController {
   // Command
   @PostMapping
   public DataResponse<GameResponse> createGame(
+      @RequestHeader(HEADER_USER_ID) UUID userId,
       @Valid @RequestBody CreateGameRequest request,
       BindingResult result
   ) {
     validateAndThrowIfInvalid(result);
-    return created(gameCommandService.createGame(request));
+    return created(gameCommandService.createGame(userId, request));
   }
 
   @PatchMapping("/{gameId}")
-  public DataResponse<GameResponse> updateGame(@PathVariable UUID gameId,
+  public DataResponse<GameResponse> updateGame(
+      @RequestHeader(HEADER_USER_ID) UUID userId,
+      @PathVariable UUID gameId,
       @RequestBody UpdateGameRequest request) {
-    return ok(gameCommandService.updateGame(gameId, request));
+    return ok(gameCommandService.updateGame(userId, gameId, request));
   }
 
   @DeleteMapping("/{gameId}")
-  public BasicResponse deleteGame(@PathVariable UUID gameId) {
-    gameCommandService.deleteGame(gameId);
+  public DataResponse<Object> deleteGame(
+      @RequestHeader(HEADER_USER_ID) UUID userId,
+      @PathVariable UUID gameId) {
+    gameCommandService.deleteGame(userId, gameId);
     return noContent();
   }
 
