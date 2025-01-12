@@ -31,6 +31,9 @@ public class Payments {
     @Column(name = "status", length = 20, nullable = false)
     private PaymentStatus status;
 
+    @Column(name = "payment_key", length = 201)
+    private String paymentKey;
+
     @Column(name = "created_by", length = 50, nullable = false)
     private String createdBy;
 
@@ -42,5 +45,27 @@ public class Payments {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public static Payments createPayments(UUID orderId, long amount) {
+        return Payments.builder()
+            .orderId(orderId)
+            .amount(amount)
+            .status(PaymentStatus.PENDING)
+            .createdBy(orderId.toString())
+            .createdAt(LocalDateTime.now())
+            .updatedBy(orderId.toString())
+            .updatedAt(LocalDateTime.now())
+            .build();
+    }
+    public void updateToComplete(String paymentKey) {
+        this.paymentKey = paymentKey;
+        this.status = PaymentStatus.COMPLETED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateToCancel() {
+        this.status = PaymentStatus.CANCELLED;
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }
