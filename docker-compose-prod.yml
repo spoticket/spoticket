@@ -1,0 +1,180 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    ports:
+      - "${ZOOKEEPER_PORT}:2181"
+    networks:
+      - spoticket-network
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+        - zookeeper
+    ports:
+        - "${KAFKA_PORT}:9092"
+    networks:
+      - spoticket-network
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ${ZOOKEEPER_CONNECT}
+      KAFKA_ADVERTISED_LISTENERS: ${ADVERTISED_LISTENERS}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "${KAFKA_UI_PORT}:8080"
+    networks:
+      - spoticket-network
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: ${BOOTSTRAPSERVERS}
+      KAFKA_CLUSTERS_0_ZOOKEEPER: ${CLUSTERS_ZOOKEEPER}
+
+  server:
+    build:
+      context: ./com.spoticket.server
+    image: com.spoticket.server
+    ports:
+      - "${EUREKA_PORT}:${EUREKA_PORT}"
+    networks:
+      - spoticket-network
+    environment:
+      - SPRING_APPLICATION_NAME=server
+      - SERVER_PORT=${EUREKA_PORT}
+      - eureka.client.serviceUrl.defaultZone=http://server:${EUREKA_PORT}/eureka/
+
+  gateway:
+    build:
+      context: ./com.spoticket.gateway
+    image: com.spoticket.gateway
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+    environment:
+      - SPRING_APPLICATION_NAME=gateway
+      - SERVER_PORT=${GATEWAY_PORT}
+      - eureka.client.serviceUrl.defaultZone=http://server:${EUREKA_PORT}/eureka/
+      - eureka.instance.preferIpAddress=true
+      - eureka.client.registerWithEureka=true
+      - eureka.client.fetchRegistry=true
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+  user:
+    build:
+      context: ./com.spoticket.user
+    image: com.spoticket.user
+    ports:
+      - "${USER_PORT}:${USER_PORT}"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://server:${EUREKA_PORT}/eureka/
+      - SPRING_APPLICATION_NAME=user
+      - SERVER_PORT=${USER_PORT}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ACCESS_EXPIRATION=3000
+      - POSTGRES_DEV_URL=${POSTGRES_DEV_URL}
+      - POSTGRES_DEV_USERNAME=${POSTGRES_DEV_USERNAME}
+      - POSTGRES_DEV_PASSWORD=${POSTGRES_DEV_PASSWORD}
+      - USER_SCHEMA=${USER_SCHEMA}
+
+  team-stadium:
+    build:
+      context: ./com.spoticket.team-stadium
+    image: com.spoticket.team-stadium
+    ports:
+      - "${TEAM_STADIUM}:${TEAM_STADIUM}"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+    environment:
+      - SPRING_APPLICATION_NAME=team-stadium
+      - SERVER_PORT=${TEAM_STADIUM}
+      - eureka.client.serviceUrl.defaultZone=http://server:${EUREKA_PORT}/eureka/
+      - POSTGRES_DEV_URL=${POSTGRES_DEV_URL}
+      - POSTGRES_DEV_USERNAME=${POSTGRES_DEV_USERNAME}
+      - POSTGRES_DEV_PASSWORD=${POSTGRES_DEV_PASSWORD}
+      - TEAM_STADIUM_SCHEMA=${TEAM_STADIUM_SCHEMA}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_DATABASE=${REDIS_DATABASE}
+  game:
+    build:
+      context: ./com.spoticket.games
+    image: com.spoticket.game
+    ports:
+      - "${GAME_PORT}:${GAME_PORT}"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=${GAME_PORT}
+      - eureka.client.serviceUrl.defaultZone=http://server:${EUREKA_PORT}/eureka/
+      - POSTGRES_DEV_URL=${POSTGRES_DEV_URL}
+      - POSTGRES_DEV_USERNAME=${POSTGRES_DEV_USERNAME}
+      - POSTGRES_DEV_PASSWORD=${POSTGRES_DEV_PASSWORD}
+      - GAME_SCHEMA=${GAME_SCHEMA}
+      - SLACK_TOKEN=${SLACK_TOKEN}
+  payment:
+    build:
+      context: ./com.spoticket.payment
+    image: com.spoticket.payment
+    ports:
+      - "${PAYMENT_PORT}:${PAYMENT_PORT}"
+    depends_on:
+      - server
+      - kafka
+    networks:
+      - spoticket-network
+    environment:
+      - TOSS_SECRET_KEY=${TOSS_SECRET_KEY}
+      - SPRING_PROFILES_ACTIVE=prod
+      - SERVER_PORT=${PAYMENT_PORT}
+      - eureka.client.serviceUrl.defaultZone=http://server:${EUREKA_PORT}/eureka/
+      - POSTGRES_DEV_URL=${POSTGRES_DEV_URL}
+      - POSTGRES_DEV_USERNAME=${POSTGRES_DEV_USERNAME}
+      - POSTGRES_DEV_PASSWORD=${POSTGRES_DEV_PASSWORD}
+      - PAYMENT_SCHEMA=${PAYMENT_SCHEMA}
+
+  ticket:
+    build:
+      context: ./com.spoticket.ticket
+    image: com.spoticket.ticket
+    ports:
+      - "${TICKET_PORT}:${TICKET_PORT}"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+    environment:
+      - SERVER_PORT=${TICKET_PORT}
+      - eureka.client.serviceUrl.defaultZone=http://server:${EUREKA_PORT}/eureka/
+      - POSTGRES_DEV_URL=${POSTGRES_DEV_URL}
+      - POSTGRES_DEV_USERNAME=${POSTGRES_DEV_USERNAME}
+      - POSTGRES_DEV_PASSWORD=${POSTGRES_DEV_PASSWORD}
+      - TICKET_SCHEMA=${TICKET_SCHEMA}
+
+
+
+networks:
+  spoticket-network:
+    driver: bridge

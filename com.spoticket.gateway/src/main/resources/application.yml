@@ -1,0 +1,59 @@
+server:
+  port: ${GATEWAY_PORT}
+
+spring:
+  application:
+    name: gateway
+
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      routes:
+        - id: user
+          uri: lb://user
+          predicates:
+            - Path=/api/v1/users/**, /api/v1/coupons/**
+
+        - id: team-stadium
+          uri: lb://team-stadium
+          predicates:
+            - Path=/api/v1/teams/**, /api/v1/stadiums/**
+
+        - id: game
+          uri: lb://game
+          predicates:
+            - Path=/api/v1/games/**
+
+        - id: payment
+          uri: lb://payment
+          predicates:
+            - Path=/api/v1/payments/**, /api/v1/orders/**
+
+        - id: ticket
+          uri: lb://ticket
+          predicates:
+            - Path=/api/v1/tickets/**
+
+      discovery:
+        locator:
+          enabled: true
+
+  # Authorization Rules
+  config:
+    import:
+      - authorization-rule.yml
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL}
+
+service:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}

@@ -27,6 +27,7 @@ public class UserCoupon extends BaseEntity {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
+    @Builder.Default
     @ColumnDefault("'NOT_USE'")
     private String status = "NOT_USE";
 
