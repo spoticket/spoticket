@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: user
+
+  datasource:
+    url: ${POSTGRES_DEV_URL}
+    username: ${POSTGRES_DEV_USERNAME}
+    password: ${POSTGRES_DEV_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: ${USER_SCHEMA}
+    show-sql: true
+
+server:
+  port: ${USER_PORT}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL}
+
+service:
+  jwt:
+    access-expiration: 360000
+    secret-key: ${JWT_SECRET_KEY}

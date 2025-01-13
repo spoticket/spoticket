@@ -1,0 +1,25 @@
+spring:
+  profiles:
+    active: # 어떠한 프로필 그룹을 활성화시킬지 결정해줍니다
+      - prod
+    group: # 필요한 설정들을 그룹화해주고 있습니다(여기서는 DB 설정만 적용하였습니다)
+      local:
+          - db-local #db-local 프로필
+      prod:
+          - db-aws #db-aws 프로필
+      docker-local:
+          - db-docker-local #db-docker-local 프로필
+    include: # application-db.yml 파일을 참고하도록 설정해줍니다
+        - db
+  application:
+    name: payment
+toss:
+  api:
+    toss_secret: ${TOSS_SECRET_KEY}
+server:
+  port: ${PAYMENT_PORT}
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL}
+
