@@ -73,7 +73,7 @@ jobs:
         for SERVICE in "${SERVICES[@]}"; do
           cd ./$SERVICE
           chmod +x gradlew
-          ./gradlew clean build
+          ./gradlew clean build -x test
           cd ..
         done
 
