@@ -1,3 +1,13 @@
 .DS_Store
 .idea
 .yml
+
+/.github/workflows/deploy.yml
+/com.spoticket.payment/Dockerfile
+/docker-compose.yml
+/**.env
+/.env
+/com.spoticket.server/src/main/resources/application.yml
+/com.spoticket.payment/src/main/resources/application.yml
+/com.spoticket.payment/src/main/resources/application-db.yml
+/com.spoticket.gateway/src/main/resources/application.yml
