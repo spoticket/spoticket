@@ -1,0 +1,63 @@
+authorization:
+  rules:
+    ## ROLE LIST
+    # ROLE_MASTER, ROLE_USER, ROLE_ADMIN
+
+    ###### Auth ######
+    - path: /api/v1/users/**
+      method:
+        - GET
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER
+    - path: /api/v1/users/test
+      method:
+        - GET
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER
+    - path: /api/v1/users
+      method:
+        - PATCH
+        - GET
+      roles:
+        - ROLE_MASTER
+    ###### teamstadium ######
+    - path: /api/v1/teams/**
+      method:
+        - POST
+        - GET
+        - PATCH
+        - PUT
+        - DELETE
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER
+        - PUBLIC
+    - path: /api/v1/stadiums/**
+      method:
+        - POST
+        - GET
+        - PATCH
+        - PUT
+        - DELETE
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER
+        - PUBLIC
+    ##### game #####
+    - path: /api/v1/games/**
+      method:
+        - POST
+        - GET
+        - PATCH
+        - PUT
+        - DELETE
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER
