@@ -28,7 +28,7 @@ public class OrderService {
     @Transactional
     public OrderRes createOrder(CreateOrderReq createOrderReq) {
         if (createOrderReq.getUserCouponId() != null) {
-            validateHasCoupon(createOrderReq.getUserCouponId());
+            orderDomainService.validateHasCoupon(createOrderReq.getUserCouponId() ,createOrderReq.getUserID());
         }
         List<OrderItem> orderItems = createOrderItems(createOrderReq);
 
@@ -53,7 +53,5 @@ public class OrderService {
             .collect(Collectors.toList());
     }
 
-    public void validateHasCoupon(UUID couponId) {
 
-    }
 }
