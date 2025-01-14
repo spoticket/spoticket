@@ -4,7 +4,7 @@ services:
   server:
     build:
       context: ./com.spoticket.server
-    image: com.spoticket.server
+    image: 149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/server:latest
     ports:
       - "8761:8761"
     networks:
@@ -13,7 +13,7 @@ services:
   gateway:
     build:
       context: ./com.spoticket.gateway
-    image: com.spoticket.gateway
+    image: 149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/gateway:latest
     ports:
       - "8080:8080"
     depends_on:
@@ -24,7 +24,7 @@ services:
   user:
     build:
       context: ./com.spoticket.user
-    image: com.spoticket.user
+    image: 149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/user:latest
     ports:
       - "8081:8081"
     depends_on:
@@ -35,7 +35,7 @@ services:
   team-stadium:
     build:
       context: ./com.spoticket.team-stadium
-    image: com.spoticket.team-stadium
+    image: 149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/team-stadium:latest
     ports:
       - "8082:8082"
     depends_on:
@@ -46,7 +46,7 @@ services:
   game:
     build:
       context: ./com.spoticket.games
-    image: com.spoticket.game
+    image: 149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/game:latest
     ports:
       - "8083:8083"
     depends_on:
@@ -57,7 +57,7 @@ services:
   payment:
     build:
       context: ./com.spoticket.payment
-    image: com.spoticket.payment
+    image: 149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/payment:latest
     ports:
       - "8084:8084"
     depends_on:
@@ -68,7 +68,7 @@ services:
   ticket:
     build:
       context: ./com.spoticket.ticket
-    image: com.spoticket.ticket
+    image: 149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/ticket:latest
     ports:
       - "8085:8085"
     depends_on:
