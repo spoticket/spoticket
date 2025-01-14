@@ -58,11 +58,24 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    - name: Build with Gradle
-      run: ./gradlew clean build
+    - name: Build with Gradle for each service
+      run: |
+        SERVICES=(
+          "com.spoticket.gateway"
+          "com.spoticket.payment"
+          "com.spoticket.server"
+          "com.spoticket.team-stadium"
+          "com.spoticket.ticket"
+          "com.spoticket.user"
+          "com.spoticket.games"
+        )
+        
+        for SERVICE in "${SERVICES[@]}"; do
+          cd ./$SERVICE
+          chmod +x gradlew
+          ./gradlew clean build
+          cd ..
+        done
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3
