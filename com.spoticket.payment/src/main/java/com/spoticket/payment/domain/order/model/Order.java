@@ -4,7 +4,6 @@ import com.spoticket.payment.domain.order.service.OrderDomainService;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
