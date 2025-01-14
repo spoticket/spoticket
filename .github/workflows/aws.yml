@@ -121,6 +121,11 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
+        sudo apt-get update
+        sudo apt-get install -y docker-compose
+
+        cd $GITHUB_WORKSPACE
+      
         SERVICES=(
           "com.spoticket.gateway"
           "com.spoticket.payment"
