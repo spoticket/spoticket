@@ -27,15 +27,11 @@ public class UserCoupon extends BaseEntity {
     @JoinColumn(name = "coupon_id")
     private Coupon coupon;
 
-    @ColumnDefault("'NOT_USE'")
+    @Builder.Default
     private String status = "NOT_USE";
 
     public void use() {
         this.status = "USED";
-    }
-
-    public void expiry() {
-        this.status = "EXPIRED";
     }
 
     public static UserCoupon of(User user, Coupon coupon){
