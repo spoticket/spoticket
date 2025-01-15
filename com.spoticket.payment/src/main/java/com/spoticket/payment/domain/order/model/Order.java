@@ -74,6 +74,9 @@ public class Order {
     public void calculateAndSetTotalAmount(OrderDomainService orderDomainService) {
         this.amount = orderDomainService.calculateTotalPrice(this.orderItems);
     }
+    public void calculatePriceWithCouponDiscount(OrderDomainService orderDomainService, Double discountRate) {
+        this.amount = orderDomainService.calculatePriceWithCouponDiscount(this.amount, discountRate);
+    }
 
     public void addOrderItem(List<OrderItem> orderItem) {
 
