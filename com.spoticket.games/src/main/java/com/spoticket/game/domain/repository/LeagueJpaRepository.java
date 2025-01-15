@@ -28,4 +28,6 @@ public interface LeagueJpaRepository extends JpaRepository<League, UUID> {
   Page<League> findAllBySportAndIsDeletedFalse(Sport sport, Pageable pageable);
 
   Page<League> findAllByIsDeletedFalse(Pageable pageable);
+
+  Optional<League> findByNameAndIsDeletedFalse(String name);
 }

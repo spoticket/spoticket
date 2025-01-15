@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.util.StringUtils;
 
 @Entity(name = "p_leagues")
 @NoArgsConstructor
@@ -65,5 +66,21 @@ public class League extends BaseEntity {
         .startAt(startAt)
         .endAt(endAt)
         .build();
+  }
+
+  public void update(
+      String name,
+      LocalDate startAt,
+      LocalDate endAt
+  ) {
+    if (name != null && StringUtils.hasText(name) && name.length() <= 200) {
+      this.name = name;
+    }
+    if (startAt != null) {
+      this.startAt = startAt;
+    }
+    if (endAt != null) {
+      this.endAt = endAt;
+    }
   }
 }

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record ReadLeagueResponse(
     UUID leagueId,
+    String name,
     Integer season,
     LocalDate startAt,
     LocalDate endAt,
@@ -16,6 +17,7 @@ public record ReadLeagueResponse(
   public static ReadLeagueResponse from(League league) {
     return new ReadLeagueResponse(
         league.getLeagueId(),
+        league.getName(),
         league.getSeason(),
         league.getStartAt(),
         league.getEndAt(),

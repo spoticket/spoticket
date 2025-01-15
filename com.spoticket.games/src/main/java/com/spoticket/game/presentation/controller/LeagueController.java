@@ -3,6 +3,7 @@ package com.spoticket.game.presentation.controller;
 import com.spoticket.game.application.service.LeagueService;
 import com.spoticket.game.domain.model.Sport;
 import com.spoticket.game.dto.request.CreateLeagueRequest;
+import com.spoticket.game.dto.request.UpdateLeagueRequest;
 import com.spoticket.game.dto.response.GenericPagedModel;
 import com.spoticket.game.dto.response.ReadLeagueListResponse;
 import com.spoticket.game.dto.response.ReadLeagueResponse;
@@ -11,7 +12,9 @@ import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,6 +53,23 @@ public class LeagueController {
       @RequestParam(defaultValue = "10") int size
   ) {
     return leagueService.readLeagueList(sport, page, size);
+  }
+
+  // 리그 수정
+  @PatchMapping("/{leagueId}")
+  public DataResponse<Void> updateLeague(
+      @PathVariable UUID leagueId,
+      @Valid @RequestBody UpdateLeagueRequest request
+  ) {
+    return leagueService.updateLeague(leagueId, request);
+  }
+
+  // 리그 삭제
+  @DeleteMapping("/{leagueId}")
+  public DataResponse<Void> deleteLeague(
+      @PathVariable UUID leagueId
+  ) {
+    return leagueService.deleteLeague(leagueId);
   }
 
 }
