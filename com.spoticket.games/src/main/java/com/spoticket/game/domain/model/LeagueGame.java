@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Min;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -40,4 +41,22 @@ public class LeagueGame extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "league_id", nullable = false)
   private League league;
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "game_id", nullable = false)
+  private Game game;
+
+  public static LeagueGame create(
+      Game game,
+      League league,
+      int homeScore,
+      int awayScore
+  ) {
+    return LeagueGame.builder()
+        .game(game)
+        .league(league)
+        .homeScore(homeScore)
+        .awayScore(awayScore)
+        .build();
+  }
 }

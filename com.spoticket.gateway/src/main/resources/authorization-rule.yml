@@ -72,3 +72,14 @@ authorization:
         - ROLE_MASTER
         - ROLE_ADMIN
         - ROLE_USER
+    - path: /api/v1/results/**
+      method:
+        - POST
+        - GET
+        - PATCH
+        - PUT
+        - DELETE
+      roles:
+        - ROLE_MASTER
+        - ROLE_ADMIN
+        - ROLE_USER

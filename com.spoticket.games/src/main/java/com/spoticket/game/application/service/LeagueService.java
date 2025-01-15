@@ -91,7 +91,7 @@ public class LeagueService {
 
   public League findById(UUID leagueId) {
     return leagueJpaRepository.findByLeagueIdAndIsDeletedFalse(leagueId)
-        .orElseThrow(() -> new CustomException(400, "해당하는 리그가 없습니다"));
+        .orElseThrow(() -> new CustomException(404, "해당하는 리그가 없습니다"));
   }
 
   private void validateUserHasAdminOrMasterRole() {
