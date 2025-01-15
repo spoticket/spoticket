@@ -59,4 +59,13 @@ public class LeagueGame extends BaseEntity {
         .awayScore(awayScore)
         .build();
   }
+
+  public void update(Integer homeScore, Integer awayScore) {
+    if (homeScore != null && homeScore >= 0) {
+      this.homeScore = homeScore;
+    }
+    if (awayScore != null && awayScore >= 0) {
+      this.awayScore = awayScore;
+    }
+  }
 }

@@ -2,6 +2,7 @@ package com.spoticket.game.presentation.controller;
 
 import com.spoticket.game.application.service.ResultService;
 import com.spoticket.game.dto.request.CreateResultRequest;
+import com.spoticket.game.dto.request.UpdateLeagueGameRequest;
 import com.spoticket.game.dto.response.GenericPagedModel;
 import com.spoticket.game.dto.response.ReadLeagueGameListResponse;
 import com.spoticket.game.dto.response.ReadResultResponse;
@@ -10,7 +11,9 @@ import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,5 +49,20 @@ public class ResultController {
       @RequestParam(defaultValue = "10") int size
   ) {
     return resultService.readResultList(league, page, size);
+  }
+
+  @PatchMapping("/{leagueGameId}")
+  public DataResponse<Void> updateResult(
+      @PathVariable UUID leagueGameId,
+      @Valid @RequestBody UpdateLeagueGameRequest request
+  ) {
+    return resultService.updateResult(leagueGameId, request);
+  }
+
+  @DeleteMapping("/{leagueGameId}")
+  public DataResponse<Void> deleteResult(
+      @PathVariable UUID leagueGameId
+  ) {
+    return resultService.deleteResut(leagueGameId);
   }
 }

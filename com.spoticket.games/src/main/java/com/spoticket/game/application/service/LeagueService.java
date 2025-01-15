@@ -86,6 +86,7 @@ public class LeagueService {
     validateUserHasAdminOrMasterRole();
     League league = findById(leagueId);
     league.delete(RequestUtils.getCurrentUserId());
+    leagueJpaRepository.save(league);
     return new DataResponse<>(200, "삭제 완료", null);
   }
 

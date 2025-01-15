@@ -9,6 +9,7 @@ import com.spoticket.game.domain.model.LeagueGame;
 import com.spoticket.game.domain.repository.GameJpaRepository;
 import com.spoticket.game.domain.repository.ResultJpaRepository;
 import com.spoticket.game.dto.request.CreateResultRequest;
+import com.spoticket.game.dto.request.UpdateLeagueGameRequest;
 import com.spoticket.game.dto.response.GenericPagedModel;
 import com.spoticket.game.dto.response.ReadLeagueGameListResponse;
 import com.spoticket.game.dto.response.ReadResultResponse;
@@ -61,6 +62,22 @@ public class ResultService {
     Page<LeagueGame> lgs = resultJpaRepository.findAllByLeagueAndIsDeletedFalse(league, pageable);
     Page<ReadLeagueGameListResponse> response = lgs.map(ReadLeagueGameListResponse::from);
     return new DataResponse<>(200, "조회 완료", GenericPagedModel.of(response));
+  }
+
+  public DataResponse<Void> updateResult(UUID leagueGameId, UpdateLeagueGameRequest request) {
+    validateUserHasAdminOrMasterRole();
+    LeagueGame lg = findById(leagueGameId);
+    lg.update(request.homeScore(), request.awayScore());
+    resultJpaRepository.save(lg);
+    return new DataResponse<>(200, "수정 완료", null);
+  }
+
+  public DataResponse<Void> deleteResut(UUID leagueGameId) {
+    validateUserHasAdminOrMasterRole();
+    LeagueGame lg = findById(leagueGameId);
+    lg.delete(RequestUtils.getCurrentUserId());
+    resultJpaRepository.save(lg);
+    return new DataResponse<>(200, "삭제 완료", null);
   }
 
   public LeagueGame findById(UUID leagueGameId) {
