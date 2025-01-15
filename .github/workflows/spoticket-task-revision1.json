@@ -3,11 +3,155 @@
     "containerDefinitions": [
         {
             "name": "spoticket-container",
-            "image": "149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket",
+            "image": "149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/ticket:latest",
             "cpu": 0,
             "portMappings": [
                 {
-                    "name": "spoticket-container-8080-tcp",
+                    "name": "ticket-container-8080-tcp",
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/spoticket-task",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        },
+        {
+            "name": "spoticket-container",
+            "image": "149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/payment:latest",  
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "payment-container-8080-tcp",
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/spoticket-task",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        },
+        {
+            "name": "spoticket-container",
+            "image": "149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/game:latest", 
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "game-container-8080-tcp",
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/spoticket-task",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        },
+        {
+            "name": "spoticket-container",
+            "image": "149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/team-stadium:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "team-stadium-container-8080-tcp",
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/spoticket-task",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        },
+        {
+            "name": "spoticket-container",
+            "image": "149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/user:latest", 
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "user-container-8080-tcp",
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/spoticket-task",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        },
+        {
+            "name": "spoticket-container",
+            "image": "149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/gateway:latest", 
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "gateway-container-8080-tcp",
+                    "containerPort": 8080,
+                    "hostPort": 8080,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/spoticket-task",
+                    "awslogs-region": "ap-northeast-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        },
+        {
+            "name": "spoticket-container",
+            "image": "149536452121.dkr.ecr.ap-northeast-2.amazonaws.com/spoticket/server:latest", 
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "server-container-8080-tcp",
                     "containerPort": 8080,
                     "hostPort": 8080,
                     "protocol": "tcp",
