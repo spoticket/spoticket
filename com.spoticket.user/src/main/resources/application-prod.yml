@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: user
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: user_service
+    hibernate:
+      ddl-auto: validate
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      password: ${REDIS_PASSWORD}
+      database: 0
+
+server:
+  port: 8081
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://spoticket-lb-368000243.ap-northeast-2.elb.amazonaws.com/eureka
+
+service:
+  jwt:
+    access-expiration: 360000
+    secret-key: ${JWT_SECRET_KEY}
