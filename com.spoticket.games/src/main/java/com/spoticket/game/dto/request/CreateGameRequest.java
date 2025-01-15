@@ -20,9 +20,8 @@ public class CreateGameRequest {
 
   @NotNull
   private Sport sport;
-
-  @NotBlank
-  private String league;
+  
+  private UUID leagueId;
 
   @NotNull
   private UUID stadiumId;
