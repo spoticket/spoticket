@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.Min;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,15 +42,28 @@ public class League extends BaseEntity {
 
   private LocalDate endAt;
 
-  @Min(0)
-  private Integer teamCnt = 0;
-
   @OneToMany(mappedBy = "league")
   private List<LeagueGame> leagueGames = new ArrayList<>();
-  
+
   @OneToMany(mappedBy = "league")
   private List<LeagueTeam> leagueTeams = new ArrayList<>();
 
   @OneToMany(mappedBy = "league")
   private List<Game> games = new ArrayList<>();
+
+  public static League create(
+      String name,
+      Sport sport,
+      int season,
+      LocalDate startAt,
+      LocalDate endAt
+  ) {
+    return League.builder()
+        .name(name)
+        .sport(sport)
+        .season(season)
+        .startAt(startAt)
+        .endAt(endAt)
+        .build();
+  }
 }
