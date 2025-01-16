@@ -25,8 +25,9 @@ public class GameQueryRepository extends Querydsl4RepositorySupport {
 
   public Page<GameResponse> getGames(SearchCondition condition) {
     return applyPagination(condition.getPageable(), contentQuery -> contentQuery
-            .select(new QGameResponse(game.gameId, game.title, game.startTime, game.sport, game.league,
-                game.stadiumId, game.homeTeamId, game.awayTeamId))
+            .select(
+                new QGameResponse(game.gameId, game.title, game.startTime, game.sport, game.league.name,
+                    game.stadiumId, game.homeTeamId, game.awayTeamId))
             .from(game)
             .where(createSearchBooleanBuilder(condition)),
         countQuery -> countQuery
@@ -54,7 +55,7 @@ public class GameQueryRepository extends Querydsl4RepositorySupport {
   }
 
   private BooleanBuilder leagueEq(String leagueCond) {
-    return nullSafeBuilder(() -> game.league.eq(leagueCond));
+    return nullSafeBuilder(() -> game.league.name.eq(leagueCond));
   }
 
   private BooleanBuilder stadiumIdEq(UUID stadiumIdCond) {
