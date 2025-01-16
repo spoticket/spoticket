@@ -15,7 +15,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity(name = "p_team_scores")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Getter
 public class TeamScore {
 
@@ -31,8 +31,9 @@ public class TeamScore {
   @Column(nullable = false)
   private BigDecimal totalWinRate;
 
-  private Integer currnetRank;
+  private Integer currentRank;
 
+  @Column(nullable = false)
   private UUID teamId;
 
 }
