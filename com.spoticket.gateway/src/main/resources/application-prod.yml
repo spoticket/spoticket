@@ -45,7 +45,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://spoticket-lb-368000243.ap-northeast-2.elb.amazonaws.com/eureka
+      defaultZone: http://13.125.249.226/eureka
 
 service:
   jwt:

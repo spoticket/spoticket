@@ -1,4 +1,10 @@
 FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY . /app
+COPY src/main/resources/application-ec2.yml /app/
+COPY src/main/resources/authorization-rule.yml /app/
+RUN chmod +x ./gradlew
+RUN ./gradlew clean build --refresh-dependencies -x test
 ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+COPY ${JAR_FILE} /app/app.jar
+CMD ["java", "-jar", "-Dspring.profiles.active=ec2", "/app/app.jar"]
