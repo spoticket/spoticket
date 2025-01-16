@@ -86,12 +86,13 @@ public class LeagueService {
     validateUserHasAdminOrMasterRole();
     League league = findById(leagueId);
     league.delete(RequestUtils.getCurrentUserId());
+    leagueJpaRepository.save(league);
     return new DataResponse<>(200, "삭제 완료", null);
   }
 
   public League findById(UUID leagueId) {
     return leagueJpaRepository.findByLeagueIdAndIsDeletedFalse(leagueId)
-        .orElseThrow(() -> new CustomException(400, "해당하는 리그가 없습니다"));
+        .orElseThrow(() -> new CustomException(404, "해당하는 리그가 없습니다"));
   }
 
   private void validateUserHasAdminOrMasterRole() {
