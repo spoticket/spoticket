@@ -2,13 +2,13 @@ package com.spoticket.game.application.service;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.spoticket.game.application.dto.request.SearchCondition;
+import com.spoticket.game.application.dto.response.GameResponse;
+import com.spoticket.game.application.dto.response.GenericPagedModel;
+import com.spoticket.game.common.exception.CustomException;
 import com.spoticket.game.domain.model.Game;
-import com.spoticket.game.domain.repository.GameJpaRepository;
-import com.spoticket.game.domain.repository.GameQueryRepository;
-import com.spoticket.game.dto.request.SearchCondition;
-import com.spoticket.game.dto.response.GameResponse;
-import com.spoticket.game.dto.response.GenericPagedModel;
-import com.spoticket.game.global.exception.CustomException;
+import com.spoticket.game.infrastructure.repository.GameJpaRepository;
+import com.spoticket.game.infrastructure.repository.GameQueryRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
