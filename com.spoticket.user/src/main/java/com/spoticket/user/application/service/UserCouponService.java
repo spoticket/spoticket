@@ -99,7 +99,12 @@ public class UserCouponService {
                 userCoupon.getUserCouponId(),
                 userCoupon.getUser().getUserId(),
                 userCoupon.getCoupon().getCouponId(),
-                userCoupon.getStatus()
+                userCoupon.getStatus(),
+                userCoupon.getCoupon().getName(),
+                userCoupon.getCoupon().getExpirationAt(),
+                userCoupon.getCoupon().getType(),
+                userCoupon.getCoupon().getDiscountRate(),
+                userCoupon.getCoupon().getIsActive()
         );
 
         return SuccessResponse.ok(response);

@@ -7,8 +7,11 @@ import com.spoticket.game.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -39,7 +42,9 @@ public class Game extends BaseEntity {
   @Enumerated(value = EnumType.STRING)
   private Sport sport;
 
-  private String league;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "league_id")
+  private League league;
 
   private UUID stadiumId;
 
@@ -49,7 +54,7 @@ public class Game extends BaseEntity {
 
   private Long hits;
 
-  public static Game of(String title, LocalDateTime startTime, Sport sport, String league,
+  public static Game of(String title, LocalDateTime startTime, Sport sport, League league,
       UUID stadiumId, UUID homeTeamId, UUID awayTeamId) {
     return Game.builder()
         .title(title)
@@ -63,7 +68,7 @@ public class Game extends BaseEntity {
         .build();
   }
 
-  public void update(String title, LocalDateTime startTime, String league, Sport sport,
+  public void update(String title, LocalDateTime startTime, League league, Sport sport,
       UUID stadiumId, UUID homeTeamId, UUID awayTeamId) {
     if (isNotBlank(title)) {
       this.title = title;
@@ -71,7 +76,7 @@ public class Game extends BaseEntity {
     if (nonNull(startTime)) {
       this.startTime = startTime;
     }
-    if (isNotBlank(league)) {
+    if (nonNull(league)) {
       this.league = league;
     }
     if (nonNull(sport)) {

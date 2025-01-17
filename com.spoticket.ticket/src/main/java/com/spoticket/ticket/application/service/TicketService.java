@@ -12,6 +12,7 @@ import com.spoticket.ticket.application.dtos.response.UserResponseDto;
 import com.spoticket.ticket.domain.entity.Ticket;
 import com.spoticket.ticket.domain.entity.TicketStatus;
 import com.spoticket.ticket.domain.repository.TicketRepository;
+import com.spoticket.ticket.global.config.redisson.DistributedLock;
 import com.spoticket.ticket.global.exception.BusinessException;
 import com.spoticket.ticket.global.exception.ErrorCode;
 import com.spoticket.ticket.global.util.ApiResponse;
@@ -36,7 +37,7 @@ public class TicketService {
   private final StadiumServiceClient stadiumServiceClient;
   private final UserServiceClient userServiceClient;
 
-  @Transactional
+  @DistributedLock(key = "#request.seatName")
   public TicketResponse createTicket(CreateTicketRequest request) {
     // 좌석이 이미 예약되었는지 확인
     boolean isSeatAlreadyReserved = ticketRepository.existsBySeatNameAndStatus(request.seatName(),

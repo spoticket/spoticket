@@ -27,7 +27,7 @@ public class GameResponse {
         .title(game.getTitle())
         .startTime(game.getStartTime())
         .sport(game.getSport())
-        .league(game.getLeague())
+        .league(game.getLeague().getName())
         .stadiumId(game.getStadiumId())
         .homeTeamId(game.getHomeTeamId())
         .awayTeamId(game.getAwayTeamId())

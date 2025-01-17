@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.spoticket.game.domain.model.Game;
+import com.spoticket.game.domain.model.League;
 import com.spoticket.game.domain.model.Sport;
 import com.spoticket.game.domain.repository.GameJpaRepository;
 import com.spoticket.game.dto.response.GameResponse;
@@ -33,8 +34,15 @@ class GameQueryServiceTest {
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
+
+    League basketballLeague = League.builder()
+        .name("NBA")
+        .sport(Sport.BASKETBALL)
+        .season(2025)
+        .build();
+
     game = new Game(UUID.randomUUID(), "test", LocalDateTime.now().plusHours(2),
-        Sport.BASKETBALL, "Premier League", UUID.randomUUID(), UUID.randomUUID(),
+        Sport.BASKETBALL, basketballLeague, UUID.randomUUID(), UUID.randomUUID(),
         UUID.randomUUID(), 0L);
   }
 

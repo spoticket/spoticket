@@ -16,7 +16,7 @@ public class UpdateGameRequest {
 
   private Sport sport;
 
-  private String league;
+  private UUID leagueId;
 
   private UUID stadiumId;
 
