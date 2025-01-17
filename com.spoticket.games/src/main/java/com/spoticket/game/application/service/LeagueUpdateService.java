@@ -1,14 +1,14 @@
 package com.spoticket.game.application.service;
 
+import com.spoticket.game.common.exception.CustomException;
 import com.spoticket.game.domain.model.Game;
 import com.spoticket.game.domain.model.League;
 import com.spoticket.game.domain.model.LeagueGame;
 import com.spoticket.game.domain.model.LeagueTeam;
 import com.spoticket.game.domain.model.TeamScore;
 import com.spoticket.game.domain.repository.LeagueTeamJpaRepository;
-import com.spoticket.game.domain.repository.ResultJpaRepository;
 import com.spoticket.game.domain.repository.TeamScoreJpaRepository;
-import com.spoticket.game.global.exception.CustomException;
+import com.spoticket.game.infrastructure.repository.ResultJpaRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;

@@ -1,19 +1,19 @@
 package com.spoticket.game.application.service;
 
-import static com.spoticket.game.global.entity.UserRoleEnum.ROLE_ADMIN;
-import static com.spoticket.game.global.entity.UserRoleEnum.ROLE_MASTER;
+import static com.spoticket.game.application.dto.response.UserRoleEnum.ROLE_ADMIN;
+import static com.spoticket.game.application.dto.response.UserRoleEnum.ROLE_MASTER;
 
+import com.spoticket.game.application.dto.request.CreateLeagueRequest;
+import com.spoticket.game.application.dto.request.UpdateLeagueRequest;
+import com.spoticket.game.application.dto.response.GenericPagedModel;
+import com.spoticket.game.application.dto.response.ReadLeagueListResponse;
+import com.spoticket.game.application.dto.response.ReadLeagueResponse;
+import com.spoticket.game.common.exception.CustomException;
+import com.spoticket.game.common.util.ApiResponse;
+import com.spoticket.game.common.util.RequestUtils;
 import com.spoticket.game.domain.model.League;
 import com.spoticket.game.domain.model.Sport;
-import com.spoticket.game.domain.repository.LeagueJpaRepository;
-import com.spoticket.game.dto.request.CreateLeagueRequest;
-import com.spoticket.game.dto.request.UpdateLeagueRequest;
-import com.spoticket.game.dto.response.GenericPagedModel;
-import com.spoticket.game.dto.response.ReadLeagueListResponse;
-import com.spoticket.game.dto.response.ReadLeagueResponse;
-import com.spoticket.game.global.exception.CustomException;
-import com.spoticket.game.global.util.RequestUtils;
-import com.spoticket.game.global.util.ResponseUtils.DataResponse;
+import com.spoticket.game.infrastructure.repository.LeagueJpaRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class LeagueService {
   private final LeagueUpdateService leagueUpdateService;
 
   // 리그 정보 등록
-  public DataResponse<Map<String, UUID>> createLeague(
+  public ApiResponse<Map<String, UUID>> createLeague(
       CreateLeagueRequest request
   ) {
     validateUserHasAdminOrMasterRole();
@@ -53,18 +53,18 @@ public class LeagueService {
     );
     League savedLeague = leagueJpaRepository.save(league);
     Map<String, UUID> response = Map.of("leagueId", savedLeague.getLeagueId());
-    return new DataResponse<>(200, "등록 완료", response);
+    return new ApiResponse<>(200, "등록 완료", response);
   }
 
   // 단일 리그 조회
-  public DataResponse<ReadLeagueResponse> readLeague(UUID leagueId) {
+  public ApiResponse<ReadLeagueResponse> readLeague(UUID leagueId) {
     League league = findById(leagueId);
     ReadLeagueResponse response = ReadLeagueResponse.from(league);
-    return new DataResponse<>(200, "조회 완료", response);
+    return new ApiResponse<>(200, "조회 완료", response);
   }
 
   // 리그 목록 조회
-  public DataResponse<GenericPagedModel<ReadLeagueListResponse>> readLeagueList(
+  public ApiResponse<GenericPagedModel<ReadLeagueListResponse>> readLeagueList(
       Sport sport,
       int page,
       int size) {
@@ -73,27 +73,27 @@ public class LeagueService {
         ? leagueJpaRepository.findAllBySportAndIsDeletedFalse(sport, pageable)
         : leagueJpaRepository.findAllByIsDeletedFalse(pageable);
     Page<ReadLeagueListResponse> response = leagues.map(ReadLeagueListResponse::from);
-    return new DataResponse<>(200, "조회 완료", GenericPagedModel.of(response));
+    return new ApiResponse<>(200, "조회 완료", GenericPagedModel.of(response));
   }
 
   // 리그 수정
-  public DataResponse<Void> updateLeague(UUID leagueId, UpdateLeagueRequest request) {
+  public ApiResponse<Void> updateLeague(UUID leagueId, UpdateLeagueRequest request) {
     validateUserHasAdminOrMasterRole();
     League league = findById(leagueId);
     validateLeagueNameNotDuplicated(request.name(), leagueId);
 
     league.update(request.name(), request.startAt(), request.endAt());
     leagueJpaRepository.save(league);
-    return new DataResponse<>(200, "수정 완료", null);
+    return new ApiResponse<>(200, "수정 완료", null);
   }
 
   // 리그 삭제
-  public DataResponse<Void> deleteLeague(UUID leagueId) {
+  public ApiResponse<Void> deleteLeague(UUID leagueId) {
     validateUserHasAdminOrMasterRole();
     League league = findById(leagueId);
     league.delete(RequestUtils.getCurrentUserId());
     leagueJpaRepository.save(league);
-    return new DataResponse<>(200, "삭제 완료", null);
+    return new ApiResponse<>(200, "삭제 완료", null);
   }
 
   // LeagueTeam 업데이트
