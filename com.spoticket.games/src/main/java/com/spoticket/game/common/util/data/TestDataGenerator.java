@@ -1,4 +1,4 @@
-package com.spoticket.game.global.util.dummy;
+package com.spoticket.game.common.util.data;
 
 import com.spoticket.game.common.exception.CustomException;
 import com.spoticket.game.domain.model.Game;
@@ -9,7 +9,9 @@ import com.spoticket.game.domain.model.Sport;
 import com.spoticket.game.domain.model.TeamScore;
 import com.spoticket.game.infrastructure.repository.GameJpaRepository;
 import com.spoticket.game.infrastructure.repository.LeagueJpaRepository;
+import com.spoticket.game.infrastructure.repository.LeagueTeamJpaRepository;
 import com.spoticket.game.infrastructure.repository.ResultJpaRepository;
+import com.spoticket.game.infrastructure.repository.TeamScoreJpaRepository;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,10 +30,10 @@ public class TestDataGenerator {
 
 
   private final LeagueJpaRepository leagueRepository;
-  private final com.spoticket.game.domain.repository.LeagueTeamJpaRepository leagueTeamRepository;
+  private final LeagueTeamJpaRepository leagueTeamRepository;
   private final GameJpaRepository gameRepository;
   private final ResultJpaRepository resultRepository;
-  private final com.spoticket.game.domain.repository.TeamScoreJpaRepository teamScoreRepository;
+  private final TeamScoreJpaRepository teamScoreRepository;
 
   @Transactional
   public void generateData() {

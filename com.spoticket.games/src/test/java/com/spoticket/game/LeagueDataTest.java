@@ -2,7 +2,7 @@ package com.spoticket.game;
 
 import com.spoticket.game.application.service.LeagueService;
 import com.spoticket.game.application.service.LeagueUpdateService;
-import com.spoticket.game.global.util.dummy.TestDataGenerator;
+import com.spoticket.game.common.util.data.TestDataGenerator;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

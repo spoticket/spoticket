@@ -6,9 +6,9 @@ import com.spoticket.game.domain.model.League;
 import com.spoticket.game.domain.model.LeagueGame;
 import com.spoticket.game.domain.model.LeagueTeam;
 import com.spoticket.game.domain.model.TeamScore;
-import com.spoticket.game.domain.repository.LeagueTeamJpaRepository;
-import com.spoticket.game.domain.repository.TeamScoreJpaRepository;
+import com.spoticket.game.infrastructure.repository.LeagueTeamJpaRepository;
 import com.spoticket.game.infrastructure.repository.ResultJpaRepository;
+import com.spoticket.game.infrastructure.repository.TeamScoreJpaRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -97,7 +97,7 @@ public class LeagueUpdateService {
 
     Comparator<LeagueTeam> rankingComparator = Comparator
         .comparingInt(LeagueTeam::getTeamScore).reversed()
-        .thenComparingInt(team -> team.getTotalScore() - team.getTotalLoss())
+        .thenComparingInt(team -> team.getTotalScore() - team.getTotalLoss()).reversed()
         .thenComparingInt(LeagueTeam::getTotalScore).reversed();
 
     leagueTeams.sort(rankingComparator);
@@ -110,7 +110,7 @@ public class LeagueUpdateService {
           .currentRank(i + 1)
           .build();
 
-      teamScores.add(teamScore);
+      teamScores.set(i, teamScore);
     }
 
     teamScoreJpaRepository.saveAll(teamScores);

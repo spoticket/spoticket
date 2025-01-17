@@ -1,4 +1,4 @@
-package com.spoticket.game.domain.repository;
+package com.spoticket.game.infrastructure.repository;
 
 import com.spoticket.game.domain.model.LeagueTeam;
 import java.util.List;
