@@ -11,6 +11,8 @@ import com.spoticket.game.domain.repository.TeamScoreJpaRepository;
 import com.spoticket.game.global.exception.CustomException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +70,8 @@ public class LeagueUpdateService {
     List<LeagueTeam> leagueTeams = leagueTeamJpaRepository
         .findAllByLeagueIdAndIsDeletedFalse(league.getLeagueId());
 
+    List<TeamScore> teamScores = new ArrayList<>();
+
     for (LeagueTeam team : leagueTeams) {
       int totalGames = team.getWinCnt() + team.getDefeatCnt() + team.getDrawCnt();
 
@@ -88,31 +92,29 @@ public class LeagueUpdateService {
             .totalWinRate(totalWinRate)
             .build();
       }
-      teamScoreJpaRepository.save(teamScore);
+      teamScores.add(teamScore);
     }
 
-    leagueTeams.sort((a, b) -> {
-      if (b.getTeamScore() != a.getTeamScore()) {
-        return b.getTeamScore() - a.getTeamScore();
-      }
-      int goalDifferenceA = a.getTotalScore() - a.getTotalLoss();
-      int goalDifferenceB = b.getTotalScore() - b.getTotalLoss();
-      if (goalDifferenceB != goalDifferenceA) {
-        return goalDifferenceB - goalDifferenceA;
-      }
-      return b.getTotalScore() - a.getTotalScore();
-    });
+    Comparator<LeagueTeam> rankingComparator = Comparator
+        .comparingInt(LeagueTeam::getTeamScore).reversed()
+        .thenComparingInt(team -> team.getTotalScore() - team.getTotalLoss())
+        .thenComparingInt(LeagueTeam::getTotalScore).reversed();
 
-    int rank = 1;
-    for (LeagueTeam team : leagueTeams) {
+    leagueTeams.sort(rankingComparator);
+
+    for (int i = 0; i < leagueTeams.size(); i++) {
+      LeagueTeam team = leagueTeams.get(i);
+
       TeamScore teamScore = findByTeamId(team.getTeamId());
-
       teamScore = teamScore.toBuilder()
-          .currentRank(rank++)
+          .currentRank(i + 1)
           .build();
 
-      teamScoreJpaRepository.save(teamScore);
+      teamScores.add(teamScore);
     }
+
+    teamScoreJpaRepository.saveAll(teamScores);
+    leagueTeamJpaRepository.saveAll(leagueTeams);
   }
 
   public List<LeagueGame> findGamesByLeagueAndDate(UUID leagueId, LocalDate date) {

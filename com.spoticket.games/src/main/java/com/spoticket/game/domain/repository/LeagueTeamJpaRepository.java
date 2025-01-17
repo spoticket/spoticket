@@ -14,7 +14,7 @@ public interface LeagueTeamJpaRepository extends JpaRepository<LeagueTeam, UUID>
 
   @Query("SELECT lt FROM p_league_teams lt "
       + "WHERE lt.teamId = :teamId "
-      + "AND lt.league.leagueId = :leaueId "
+      + "AND lt.league.leagueId = :leagueId "
       + "AND lt.isDeleted = false")
   Optional<LeagueTeam> findByTeamIdAndLeagueIdAndIsDeletedFalse(
       @Param("teamId") UUID teamId,

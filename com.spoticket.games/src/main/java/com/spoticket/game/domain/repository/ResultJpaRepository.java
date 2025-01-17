@@ -33,7 +33,7 @@ public interface ResultJpaRepository extends JpaRepository<LeagueGame, UUID> {
 
   @Query("SELECT lg FROM p_league_games lg " +
       "WHERE lg.league.leagueId = :leagueId " +
-      "AND lg.createdAt = :date " +
+      "AND DATE(lg.game.startTime) = :date " +
       "AND lg.isDeleted = false")
   List<LeagueGame> findAllByLeagueIdAndDateAndIsDeletedFalse(
       @Param("leagueId") UUID leagueId,
