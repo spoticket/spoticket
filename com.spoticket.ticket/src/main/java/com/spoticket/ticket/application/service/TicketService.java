@@ -4,6 +4,7 @@ import com.spoticket.ticket.application.dtos.request.CreateTicketRequest;
 import com.spoticket.ticket.application.dtos.request.TicketSearchCriteria;
 import com.spoticket.ticket.application.dtos.request.UpdateTicketStatusRequest;
 import com.spoticket.ticket.application.dtos.response.GameResponse;
+import com.spoticket.ticket.application.dtos.response.SeatReadResponse;
 import com.spoticket.ticket.application.dtos.response.StadiumInfoResponse;
 import com.spoticket.ticket.application.dtos.response.StadiumReadResponse;
 import com.spoticket.ticket.application.dtos.response.TicketInfoResponse;
@@ -57,7 +58,7 @@ public class TicketService {
     }
 
     Ticket ticket = Ticket.create(
-        request.userId(),
+        userContextUtil.getUserId(),
         request.gameId(),
         request.stadiumId(),
         request.seatId(),
@@ -85,12 +86,18 @@ public class TicketService {
         ticket.getStadiumId());
     StadiumInfoResponse stadiumData = stadiumResponse.getData().stadium();
 
+    // 좌석 정보 가져오기
+    ApiResponse<SeatReadResponse> seatResponse = stadiumServiceClient.getSeat(
+        ticket.getSeatId());
+    SeatReadResponse seatData = seatResponse.getData();
+
     // 사용자 정보 가져오기
     ApiResponse<UserResponseDto> userResponse = userServiceClient.selectUserById(
         ticket.getUserId());
     UserResponseDto userData = userResponse.getData();
 
-    return TicketInfoResponse.from(ticket, userData.name(), gameData.title(), stadiumData.name());
+    return TicketInfoResponse.from(ticket, userData.name(), gameData.title(), stadiumData.name(),
+        seatData.section(), seatData.price());
   }
 
   @Transactional(readOnly = true)
