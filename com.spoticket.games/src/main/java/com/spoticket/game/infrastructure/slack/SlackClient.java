@@ -5,7 +5,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
-import com.spoticket.game.global.exception.CustomException;
+import com.spoticket.game.common.exception.CustomException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

@@ -3,7 +3,7 @@ package com.spoticket.game.domain.model;
 import static io.micrometer.common.util.StringUtils.isNotBlank;
 import static java.util.Objects.nonNull;
 
-import com.spoticket.game.global.entity.BaseEntity;
+import com.spoticket.game.domain.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

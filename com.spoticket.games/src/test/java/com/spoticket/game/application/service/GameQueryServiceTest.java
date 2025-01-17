@@ -6,12 +6,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.spoticket.game.application.dto.response.GameResponse;
+import com.spoticket.game.common.exception.CustomException;
 import com.spoticket.game.domain.model.Game;
 import com.spoticket.game.domain.model.League;
 import com.spoticket.game.domain.model.Sport;
-import com.spoticket.game.domain.repository.GameJpaRepository;
-import com.spoticket.game.dto.response.GameResponse;
-import com.spoticket.game.global.exception.CustomException;
+import com.spoticket.game.infrastructure.repository.GameJpaRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;

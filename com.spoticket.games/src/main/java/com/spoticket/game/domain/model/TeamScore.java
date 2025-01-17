@@ -31,7 +31,7 @@ public class TeamScore {
   @Column(nullable = false)
   private BigDecimal totalWinRate;
 
-  private Integer currnetRank;
+  private Integer currentRank;
 
   private UUID teamId;
 

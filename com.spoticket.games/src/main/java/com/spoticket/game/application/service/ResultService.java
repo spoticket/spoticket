@@ -1,21 +1,21 @@
 package com.spoticket.game.application.service;
 
-import static com.spoticket.game.global.entity.UserRoleEnum.ROLE_ADMIN;
-import static com.spoticket.game.global.entity.UserRoleEnum.ROLE_MASTER;
+import static com.spoticket.game.application.dto.response.UserRoleEnum.ROLE_ADMIN;
+import static com.spoticket.game.application.dto.response.UserRoleEnum.ROLE_MASTER;
 
+import com.spoticket.game.application.dto.request.CreateResultRequest;
+import com.spoticket.game.application.dto.request.UpdateLeagueGameRequest;
+import com.spoticket.game.application.dto.response.GenericPagedModel;
+import com.spoticket.game.application.dto.response.ReadLeagueGameListResponse;
+import com.spoticket.game.application.dto.response.ReadResultResponse;
+import com.spoticket.game.common.exception.CustomException;
+import com.spoticket.game.common.util.ApiResponse;
+import com.spoticket.game.common.util.RequestUtils;
 import com.spoticket.game.domain.model.Game;
 import com.spoticket.game.domain.model.League;
 import com.spoticket.game.domain.model.LeagueGame;
-import com.spoticket.game.domain.repository.GameJpaRepository;
-import com.spoticket.game.domain.repository.ResultJpaRepository;
-import com.spoticket.game.dto.request.CreateResultRequest;
-import com.spoticket.game.dto.request.UpdateLeagueGameRequest;
-import com.spoticket.game.dto.response.GenericPagedModel;
-import com.spoticket.game.dto.response.ReadLeagueGameListResponse;
-import com.spoticket.game.dto.response.ReadResultResponse;
-import com.spoticket.game.global.exception.CustomException;
-import com.spoticket.game.global.util.RequestUtils;
-import com.spoticket.game.global.util.ResponseUtils.DataResponse;
+import com.spoticket.game.infrastructure.repository.GameJpaRepository;
+import com.spoticket.game.infrastructure.repository.ResultJpaRepository;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,7 +33,7 @@ public class ResultService {
   private final LeagueService leagueService;
   private final GameJpaRepository gameJpaRepository;
 
-  public DataResponse<Map<String, UUID>> createResult(
+  public ApiResponse<Map<String, UUID>> createResult(
       CreateResultRequest request) {
     validateUserHasAdminOrMasterRole();
     validateLeagueGameNotDuplicated(request.leagueId(), request.gameId());
@@ -47,37 +47,37 @@ public class ResultService {
         game.get(), league, request.homeScore(), request.awayScore());
     LeagueGame savedLg = resultJpaRepository.save(lg);
     Map<String, UUID> response = Map.of("LeagueGameId", savedLg.getLeagueGameId());
-    return new DataResponse<>(200, "등록 완료", response);
+    return new ApiResponse<>(200, "등록 완료", response);
   }
 
-  public DataResponse<ReadResultResponse> readResult(UUID leagueGameId) {
+  public ApiResponse<ReadResultResponse> readResult(UUID leagueGameId) {
     LeagueGame lg = findById(leagueGameId);
     ReadResultResponse response = ReadResultResponse.from(lg, lg.getLeague(), lg.getGame());
-    return new DataResponse<>(200, "조회 완료", response);
+    return new ApiResponse<>(200, "조회 완료", response);
   }
 
-  public DataResponse<GenericPagedModel<ReadLeagueGameListResponse>> readResultList(
+  public ApiResponse<GenericPagedModel<ReadLeagueGameListResponse>> readResultList(
       UUID league, int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     Page<LeagueGame> lgs = resultJpaRepository.findAllByLeagueAndIsDeletedFalse(league, pageable);
     Page<ReadLeagueGameListResponse> response = lgs.map(ReadLeagueGameListResponse::from);
-    return new DataResponse<>(200, "조회 완료", GenericPagedModel.of(response));
+    return new ApiResponse<>(200, "조회 완료", GenericPagedModel.of(response));
   }
 
-  public DataResponse<Void> updateResult(UUID leagueGameId, UpdateLeagueGameRequest request) {
+  public ApiResponse<Void> updateResult(UUID leagueGameId, UpdateLeagueGameRequest request) {
     validateUserHasAdminOrMasterRole();
     LeagueGame lg = findById(leagueGameId);
     lg.update(request.homeScore(), request.awayScore());
     resultJpaRepository.save(lg);
-    return new DataResponse<>(200, "수정 완료", null);
+    return new ApiResponse<>(200, "수정 완료", null);
   }
 
-  public DataResponse<Void> deleteResut(UUID leagueGameId) {
+  public ApiResponse<Void> deleteResut(UUID leagueGameId) {
     validateUserHasAdminOrMasterRole();
     LeagueGame lg = findById(leagueGameId);
     lg.delete(RequestUtils.getCurrentUserId());
     resultJpaRepository.save(lg);
-    return new DataResponse<>(200, "삭제 완료", null);
+    return new ApiResponse<>(200, "삭제 완료", null);
   }
 
   public LeagueGame findById(UUID leagueGameId) {
