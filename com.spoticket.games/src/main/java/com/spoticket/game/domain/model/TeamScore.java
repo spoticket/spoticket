@@ -1,5 +1,6 @@
 package com.spoticket.game.domain.model;
 
+import com.spoticket.game.domain.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,9 +16,9 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity(name = "p_team_scores")
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Getter
-public class TeamScore {
+public class TeamScore extends BaseEntity {
 
   @Id
   @GeneratedValue
@@ -33,6 +34,7 @@ public class TeamScore {
 
   private Integer currentRank;
 
+  @Column(nullable = false)
   private UUID teamId;
 
 }

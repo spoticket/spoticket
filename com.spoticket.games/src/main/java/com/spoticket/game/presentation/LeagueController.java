@@ -4,6 +4,7 @@ import com.spoticket.game.application.dto.request.CreateLeagueRequest;
 import com.spoticket.game.application.dto.request.UpdateLeagueRequest;
 import com.spoticket.game.application.dto.response.GenericPagedModel;
 import com.spoticket.game.application.dto.response.ReadLeagueListResponse;
+import com.spoticket.game.application.dto.response.ReadLeagueRankResponse;
 import com.spoticket.game.application.dto.response.ReadLeagueResponse;
 import com.spoticket.game.application.service.LeagueService;
 import com.spoticket.game.common.util.ApiResponse;
@@ -70,6 +71,17 @@ public class LeagueController {
       @PathVariable UUID leagueId
   ) {
     return leagueService.deleteLeague(leagueId);
+  }
+
+  // 리그별 랭킹 조회
+  @GetMapping("/{leagueId}/rank")
+  public ApiResponse<ReadLeagueRankResponse> readLeagueRank(
+      @PathVariable UUID leagueId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+    ReadLeagueRankResponse response = leagueService.readLeagueRank(leagueId, page, size);
+    return new ApiResponse<>(200, "조회 완료", response);
   }
 
 }

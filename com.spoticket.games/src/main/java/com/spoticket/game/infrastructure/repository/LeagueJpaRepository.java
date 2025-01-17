@@ -2,6 +2,8 @@ package com.spoticket.game.infrastructure.repository;
 
 import com.spoticket.game.domain.model.League;
 import com.spoticket.game.domain.model.Sport;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -30,4 +32,6 @@ public interface LeagueJpaRepository extends JpaRepository<League, UUID> {
   Page<League> findAllByIsDeletedFalse(Pageable pageable);
 
   Optional<League> findByNameAndIsDeletedFalse(String name);
+
+  List<League> findAllBySeasonAndEndAtAfterAndIsDeletedFalse(int year, LocalDate now);
 }

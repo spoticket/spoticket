@@ -7,26 +7,40 @@ import com.spoticket.game.application.dto.request.CreateLeagueRequest;
 import com.spoticket.game.application.dto.request.UpdateLeagueRequest;
 import com.spoticket.game.application.dto.response.GenericPagedModel;
 import com.spoticket.game.application.dto.response.ReadLeagueListResponse;
+import com.spoticket.game.application.dto.response.ReadLeagueRankListResponse;
+import com.spoticket.game.application.dto.response.ReadLeagueRankResponse;
 import com.spoticket.game.application.dto.response.ReadLeagueResponse;
 import com.spoticket.game.common.exception.CustomException;
 import com.spoticket.game.common.util.ApiResponse;
 import com.spoticket.game.common.util.RequestUtils;
 import com.spoticket.game.domain.model.League;
+import com.spoticket.game.domain.model.LeagueTeam;
 import com.spoticket.game.domain.model.Sport;
+import com.spoticket.game.domain.model.TeamScore;
 import com.spoticket.game.infrastructure.repository.LeagueJpaRepository;
+import com.spoticket.game.infrastructure.repository.LeagueTeamJpaRepository;
+import com.spoticket.game.infrastructure.repository.TeamScoreJpaRepository;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
+@EnableScheduling
 @RequiredArgsConstructor
 public class LeagueService {
 
   private final LeagueJpaRepository leagueJpaRepository;
+  private final TeamScoreJpaRepository teamScoreJpaRepository;
+  private final LeagueTeamJpaRepository leagueTeamJpaRepository;
+  private final LeagueUpdateService leagueUpdateService;
 
   // 리그 정보 등록
   public ApiResponse<Map<String, UUID>> createLeague(
@@ -88,6 +102,35 @@ public class LeagueService {
     league.delete(RequestUtils.getCurrentUserId());
     leagueJpaRepository.save(league);
     return new ApiResponse<>(200, "삭제 완료", null);
+  }
+
+  public ReadLeagueRankResponse readLeagueRank(
+      UUID leagueId, int page, int size
+  ) {
+    League league = findById(leagueId);
+
+    Pageable pageable = PageRequest.of(page, size);
+    Page<TeamScore> teamScores = teamScoreJpaRepository.findByLeagueIdAndTeamIdInLeagueTeams(
+        leagueId, pageable);
+
+    Page<ReadLeagueRankListResponse> rankingPage = teamScores.map(ts -> {
+      LeagueTeam lt = leagueUpdateService.findLeagueTeamByTeamIdAndLeagueId(ts.getTeamId(),
+          leagueId);
+      return ReadLeagueRankListResponse.from(ts, lt);
+    });
+    GenericPagedModel<ReadLeagueRankListResponse> ranking = GenericPagedModel.of(rankingPage);
+    return new ReadLeagueRankResponse(league.getName(), league.getSeason(), ranking);
+  }
+
+  // LeagueTeam 업데이트
+  @Scheduled(cron = "0 0 0 * * ?")
+  public void updateRankings() {
+    List<League> activeLeagues = leagueJpaRepository.findAllBySeasonAndEndAtAfterAndIsDeletedFalse(
+        LocalDate.now().getYear(), LocalDate.now().minusDays(1)
+    );
+    for (League league : activeLeagues) {
+      leagueUpdateService.processLeagueUpdates(league);
+    }
   }
 
   public League findById(UUID leagueId) {
