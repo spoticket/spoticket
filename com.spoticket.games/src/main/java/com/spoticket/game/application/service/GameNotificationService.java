@@ -4,13 +4,13 @@ import static java.time.LocalDateTime.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spoticket.game.dto.response.GameResponse;
-import com.spoticket.game.dto.response.SuccessResponse;
-import com.spoticket.game.dto.response.TicketResponse;
-import com.spoticket.game.dto.response.TicketStatus;
-import com.spoticket.game.dto.response.UserResponseDto;
-import com.spoticket.game.infrastructure.client.TicketClient;
-import com.spoticket.game.infrastructure.client.UserClient;
+import com.spoticket.game.application.dto.response.GameResponse;
+import com.spoticket.game.application.dto.response.SuccessResponse;
+import com.spoticket.game.application.dto.response.TicketResponse;
+import com.spoticket.game.application.dto.response.TicketStatus;
+import com.spoticket.game.application.dto.response.UserResponseDto;
+import com.spoticket.game.infrastructure.client.TicketServiceClient;
+import com.spoticket.game.infrastructure.client.UserServiceClient;
 import com.spoticket.game.infrastructure.slack.SlackClient;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,8 +31,8 @@ public class GameNotificationService {
 
   private final GameQueryService gameQueryService;
   private final SlackClient slackClient;
-  private final TicketClient ticketClient;
-  private final UserClient userClient;
+  private final TicketServiceClient ticketServiceClient;
+  private final UserServiceClient userClient;
 
   @Scheduled(cron = "0 * * * * *")
   public void sendNotificationIfTimeMatches() {
@@ -61,9 +61,9 @@ public class GameNotificationService {
   }
 
   private List<TicketResponse> getAllBookedTickets() {
-    return ticketClient
+    return ticketServiceClient
         .getTickets(TicketStatus.BOOKED, Integer.MAX_VALUE)
-        .getData()
+        .data()
         .stream()
         .toList();
   }
