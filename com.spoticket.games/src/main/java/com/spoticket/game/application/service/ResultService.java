@@ -16,8 +16,6 @@ import com.spoticket.game.dto.response.ReadResultResponse;
 import com.spoticket.game.global.exception.CustomException;
 import com.spoticket.game.global.util.RequestUtils;
 import com.spoticket.game.global.util.ResponseUtils.DataResponse;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -85,11 +83,6 @@ public class ResultService {
   public LeagueGame findById(UUID leagueGameId) {
     return resultJpaRepository.findByLeagueGameIdAndIsDeletedFalse(leagueGameId)
         .orElseThrow(() -> new CustomException(404, "해당하는 경기결과가 없습니다"));
-  }
-
-  public List<LeagueGame> findGamesByLeagueAndDate(UUID leagueId, LocalDate date) {
-    return resultJpaRepository
-        .findAllByLeagueIdAndDateAndIsDeletedFalse(leagueId, date);
   }
 
   private void validateLeagueGameNotDuplicated(UUID leagueId, UUID gameId) {

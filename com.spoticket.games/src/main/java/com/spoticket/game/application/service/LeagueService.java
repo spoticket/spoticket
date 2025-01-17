@@ -4,13 +4,8 @@ import static com.spoticket.game.global.entity.UserRoleEnum.ROLE_ADMIN;
 import static com.spoticket.game.global.entity.UserRoleEnum.ROLE_MASTER;
 
 import com.spoticket.game.domain.model.League;
-import com.spoticket.game.domain.model.LeagueGame;
-import com.spoticket.game.domain.model.LeagueTeam;
 import com.spoticket.game.domain.model.Sport;
-import com.spoticket.game.domain.model.TeamScore;
 import com.spoticket.game.domain.repository.LeagueJpaRepository;
-import com.spoticket.game.domain.repository.LeagueTeamJpaRepository;
-import com.spoticket.game.domain.repository.TeamScoreJpaRepository;
 import com.spoticket.game.dto.request.CreateLeagueRequest;
 import com.spoticket.game.dto.request.UpdateLeagueRequest;
 import com.spoticket.game.dto.response.GenericPagedModel;
@@ -19,7 +14,6 @@ import com.spoticket.game.dto.response.ReadLeagueResponse;
 import com.spoticket.game.global.exception.CustomException;
 import com.spoticket.game.global.util.RequestUtils;
 import com.spoticket.game.global.util.ResponseUtils.DataResponse;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +23,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @EnableScheduling
@@ -38,10 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LeagueService {
 
   private final LeagueJpaRepository leagueJpaRepository;
-  private final LeagueTeamJpaRepository leagueTeamJpaRepository;
-  private final TeamScoreJpaRepository teamScoreJpaRepository;
-  private final ResultService resultService;
-
+  private final LeagueUpdateService leagueUpdateService;
 
   // 리그 정보 등록
   public DataResponse<Map<String, UUID>> createLeague(
@@ -106,111 +97,19 @@ public class LeagueService {
   }
 
   // LeagueTeam 업데이트
-  @Transactional
+  @Scheduled(cron = "0 0 0 * * ?")
   public void updateRankings() {
-    List<League> activeLagues = leagueJpaRepository.findAllBySeasonAndEndAtAfterAndIsDeletedFalse(
-        LocalDate.now().getYear(), LocalDate.now()
+    List<League> activeLeagues = leagueJpaRepository.findAllBySeasonAndEndAtAfterAndIsDeletedFalse(
+        LocalDate.now().getYear(), LocalDate.now().minusDays(1)
     );
-
-    for (League league : activeLagues) {
-      List<LeagueGame> yesterdayGames = resultService.findGamesByLeagueAndDate(
-          league.getLeagueId(), LocalDate.now().minusDays(1)
-      );
-
-      for (LeagueGame game : yesterdayGames) {
-        updateTeamStats(game);
-      }
-
-      calculateAndSaveRankings(league);
-    }
-  }
-
-  private void updateTeamStats(LeagueGame game) {
-    League league = findById(game.getLeague().getLeagueId());
-    LeagueTeam homeTeam = findLeagueTeamByTeamIdAndLeagueId(game.getGame().getHomeTeamId(),
-        league.getLeagueId()
-    );
-    LeagueTeam awayTeam = findLeagueTeamByTeamIdAndLeagueId(game.getGame().getAwayTeamId(),
-        league.getLeagueId()
-    );
-
-    int homeScore = game.getHomeScore();
-    int awayScore = game.getAwayScore();
-
-    int winPoint = 3;
-    int defeatPoint = 0;
-    if (homeScore > awayScore) {
-      homeTeam.updateStats(winPoint, homeScore, awayScore, true, false, false);
-      awayTeam.updateStats(defeatPoint, awayScore, homeScore, false, true, false);
-    } else if (game.getHomeScore() < game.getAwayScore()) {
-      homeTeam.updateStats(defeatPoint, homeScore, awayScore, false, true, false);
-      awayTeam.updateStats(winPoint, awayScore, homeScore, true, false, false);
-    } else {
-      int drawPoint = 1;
-      homeTeam.updateStats(drawPoint, homeScore, awayScore, false, false, true);
-      awayTeam.updateStats(drawPoint, awayScore, homeScore, false, false, true);
-    }
-  }
-
-  private void calculateAndSaveRankings(League league) {
-    List<LeagueTeam> leagueTeams = leagueTeamJpaRepository
-        .findAllByLeagueIdAndIsDeletedFalse(league.getLeagueId());
-
-    for (LeagueTeam team : leagueTeams) {
-      int totalGames = team.getWinCnt() + team.getDefeatCnt() + team.getDrawCnt();
-
-      TeamScore teamScore = teamScoreJpaRepository.findByTeamIdAndIsDeletedFalse(team.getTeamId())
-          .orElseGet(() -> TeamScore.builder()
-              .teamId(team.getTeamId())
-              .currentWinRate(BigDecimal.ZERO)
-              .totalWinRate(BigDecimal.ZERO)
-              .currentRank(null)
-              .build()
-          );
-      if (totalGames > 0) {
-        BigDecimal winRate = BigDecimal.valueOf((double) team.getWinCnt() / totalGames * 100);
-        teamScore = teamScore.toBuilder()
-            .currentWinRate(winRate)
-            .build();
-      }
-      teamScoreJpaRepository.save(teamScore);
-    }
-
-    leagueTeams.sort((a, b) -> {
-      if (b.getTeamScore() != a.getTeamScore()) {
-        return b.getTeamScore() - a.getTeamScore();
-      }
-      int goalDifferenceA = a.getTotalScore() - a.getTotalLoss();
-      int goalDifferenceB = b.getTotalScore() - b.getTotalLoss();
-      if (goalDifferenceB != goalDifferenceA) {
-        return goalDifferenceB - goalDifferenceA;
-      }
-      return b.getTotalScore() - a.getTotalScore();
-    });
-
-    int rank = 1;
-    for (LeagueTeam team : leagueTeams) {
-      TeamScore teamScore = teamScoreJpaRepository.findByTeamIdAndIsDeletedFalse(team.getTeamId())
-          .orElseThrow(
-              () -> new RuntimeException("TeamScore not found for teamId: " + team.getTeamId()));
-
-      teamScore = teamScore.toBuilder()
-          .currentRank(rank++)
-          .build();
-
-      teamScoreJpaRepository.save(teamScore);
+    for (League league : activeLeagues) {
+      leagueUpdateService.processLeagueUpdates(league);
     }
   }
 
   public League findById(UUID leagueId) {
     return leagueJpaRepository.findByLeagueIdAndIsDeletedFalse(leagueId)
         .orElseThrow(() -> new CustomException(404, "해당하는 리그가 없습니다"));
-  }
-
-  public LeagueTeam findLeagueTeamByTeamIdAndLeagueId(UUID teamId, UUID leagueId) {
-    return leagueTeamJpaRepository.findByTeamIdAndLeagueIdAndIsDeletedFalse(
-            teamId, leagueId)
-        .orElseThrow(() -> new CustomException(404, "해당하는 팀의 기록이 없습니다"));
   }
 
   private void validateUserHasAdminOrMasterRole() {
