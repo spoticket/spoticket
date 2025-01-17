@@ -66,11 +66,14 @@ public class UserService {
 
     public SuccessResponse<?> login(UserLoginRequestDto request) {
 
-        User user = userRepository.findByEmail(request.email()).orElseThrow(
+        String email = request.email();
+        String password = request.password();
+
+        User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new CustomException(ErrorStatus.USER_NOT_FOUND)
         );
 
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(ErrorStatus.USER_NOT_FOUND);
         }
 
