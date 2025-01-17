@@ -2,6 +2,7 @@ package com.spoticket.ticket.application.dtos.response;
 
 import com.spoticket.ticket.domain.entity.Ticket;
 import com.spoticket.ticket.domain.entity.TicketStatus;
+import java.io.Serializable;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -14,7 +15,7 @@ public record TicketResponse(
     UUID seatId,
     String seatName,
     TicketStatus status
-) {
+) implements Serializable {
 
   public static TicketResponse from(Ticket ticket) {
     return TicketResponse.builder()
