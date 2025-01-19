@@ -83,6 +83,7 @@
         body: JSON.stringify({
           paymentKey: urlParams.get("paymentKey"),
           orderId: urlParams.get("orderId"),
+          amount: urlParams.get("amount"),
           message: err.message,
           code: err.code
         })
@@ -90,6 +91,7 @@
     } catch (failError) {
       console.error("Failed to send failure information:", failError);
     }
+
     window.location.href = `/payment/fail?message=${encodeURIComponent(err.message)}&code=${encodeURIComponent(err.code)}`;
   });
 
