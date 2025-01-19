@@ -3,6 +3,7 @@ package com.spoticket.payment.application.order.service;
 
 import com.spoticket.payment.application.order.dto.CreateOrderReq;
 import com.spoticket.payment.application.order.dto.OrderRes;
+import com.spoticket.payment.application.order.dto.PaymentRequestEvent;
 import com.spoticket.payment.domain.order.exception.OrderErrorCode;
 import com.spoticket.payment.domain.order.exception.OrderException;
 import com.spoticket.payment.domain.order.model.Order;
@@ -15,24 +16,28 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderDomainService orderDomainService;
+    private final OrderKafkaService orderKafkaService;
 
     @Transactional
-    public OrderRes createOrder(CreateOrderReq createOrderReq) {
+    public OrderRes createOrder(UUID userId, CreateOrderReq createOrderReq) {
+        log.info("create order method: {}", createOrderReq);
 
         List<OrderItem> orderItems = createOrderItems(createOrderReq);
+        log.info("Received userId: {}", createOrderReq.getUserId());
 
-        Order order = Order.createOrder(createOrderReq.getUserID(),
+        Order order = Order.createOrder(userId,
             createOrderReq.getUserCouponId(),
-            createOrderReq.getUserID(),
             orderItems);
 
          order.calculateAndSetTotalAmount(orderDomainService);
@@ -41,12 +46,23 @@ public class OrderService {
         if (createOrderReq.getUserCouponId() != null) {
             UserCouponResponseDto couponInfo = orderDomainService.validateUserCoupon(
                 createOrderReq.getUserCouponId(),
-                createOrderReq.getUserID()
+                createOrderReq.getUserId()
             );
             // 검증이 완료되면 쿠폰적용가 계산을 위한 메소드를 호출
             order.calculatePriceWithCouponDiscount(orderDomainService, couponInfo.discountRate());
         }
-        return OrderRes.from(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+
+
+        orderKafkaService.sendPaymentRequest(
+            PaymentRequestEvent.builder()
+                .orderId(savedOrder.getOrderId())
+                .itemName(savedOrder.getOrderItems().get(0).getItemName())
+                .amount(savedOrder.getAmount())
+                .build()
+        );
+
+        return OrderRes.from(savedOrder);
     }
 
     private List<OrderItem> createOrderItems(CreateOrderReq createOrderReq) {
