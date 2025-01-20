@@ -11,7 +11,10 @@ import com.spoticket.payment.domain.order.model.OrderItem;
 import com.spoticket.payment.domain.order.model.OrderStatus;
 import com.spoticket.payment.domain.order.repository.OrderRepository;
 import com.spoticket.payment.domain.order.service.OrderDomainService;
+import com.spoticket.payment.infrastrucutre.order.feign.client.TicketServiceClient;
+import com.spoticket.payment.infrastrucutre.order.feign.dto.TicketInfoResponse;
 import com.spoticket.payment.infrastrucutre.order.feign.dto.UserCouponResponseDto;
+import com.spoticket.payment.presentation.common.ApiSuccessResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -29,13 +32,14 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDomainService orderDomainService;
     private final OrderKafkaService orderKafkaService;
+    private final TicketServiceClient ticketServiceClient;
 
     @Transactional
     public OrderRes createOrder(UUID userId, CreateOrderReq createOrderReq) {
         log.info("create order method: {}", createOrderReq);
 
         List<OrderItem> orderItems = createOrderItems(createOrderReq);
-        log.info("Received userId: {}, couponId:{}", createOrderReq.getUserId(), createOrderReq.getUserCouponId());
+        log.info("Received userId: {}, couponId:{}",userId, createOrderReq.getUserCouponId());
 
         Order order = Order.createOrder(userId,
             createOrderReq.getUserCouponId(),
@@ -45,12 +49,12 @@ public class OrderService {
 
          //쿠폰 객체가 파라미터로 들어오면 쿠폰 검증 시작
         if (createOrderReq.getUserCouponId() != null) {
-            UserCouponResponseDto couponInfo = orderDomainService.validateUserCoupon(
+            ApiSuccessResponse<UserCouponResponseDto> couponInfo = orderDomainService.validateUserCoupon(
                 createOrderReq.getUserCouponId(),
-                createOrderReq.getUserId()
+                userId
             );
             // 검증이 완료되면 쿠폰적용가 계산을 위한 메소드를 호출
-            order.calculatePriceWithCouponDiscount(orderDomainService, couponInfo.discountRate());
+            order.calculatePriceWithCouponDiscount(orderDomainService, couponInfo.getData().discountRate());
         }
         Order savedOrder = orderRepository.save(order);
 
@@ -68,13 +72,19 @@ public class OrderService {
 
     private List<OrderItem> createOrderItems(CreateOrderReq createOrderReq) {
         return createOrderReq.getItems().stream()
-            .map(item -> OrderItem.builder()
-                .itemName(item.getItemName())
-                .ticketId(item.getTicketId())
-                .price(item.getPrice())
-                .createdAt(LocalDateTime.now())
-                .build())
-            .collect(Collectors.toList());
+            .map(item ->{
+                ApiSuccessResponse<TicketInfoResponse> response = ticketServiceClient.getTicket(item.getTicketId());
+                log.info("received ticket: {}, msg: {}, data:{} ", response, response.getMsg(), response.getData());
+                TicketInfoResponse ticketInfo = response.getData();
+                System.out.println("ticket price: " + ticketInfo.price());
+                return OrderItem.builder()
+                    .itemName(ticketInfo.gameName())
+                    .ticketId(item.getTicketId())
+                    .price(ticketInfo.price())
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            })
+                .collect(Collectors.toList());
     }
 
     public OrderRes getOrder(UUID orderId) {
