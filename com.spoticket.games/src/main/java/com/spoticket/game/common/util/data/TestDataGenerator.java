@@ -138,15 +138,27 @@ public class TestDataGenerator {
       LeagueTeam homeTeam = findLeagueTeam(teams, game.getGame().getHomeTeamId());
       LeagueTeam awayTeam = findLeagueTeam(teams, game.getGame().getAwayTeamId());
 
+      int winPoint = 3;
+      int defeatPoint = 0;
+      int drawPoint = 1;
       if (homeScore > awayScore) {
-        homeTeam.updateStats(3, homeScore, awayScore, true, false, false);
-        awayTeam.updateStats(0, awayScore, homeScore, false, true, false);
+        homeTeam.updateStats(winPoint, homeScore, awayScore);
+        homeTeam.incrementWin();
+
+        awayTeam.updateStats(defeatPoint, awayScore, homeScore);
+        awayTeam.incrementDefeat();
       } else if (homeScore < awayScore) {
-        homeTeam.updateStats(0, homeScore, awayScore, false, true, false);
-        awayTeam.updateStats(3, awayScore, homeScore, true, false, false);
+        homeTeam.updateStats(defeatPoint, homeScore, awayScore);
+        homeTeam.incrementDefeat();
+
+        awayTeam.updateStats(winPoint, awayScore, homeScore);
+        awayTeam.incrementWin();
       } else {
-        homeTeam.updateStats(1, homeScore, awayScore, false, false, true);
-        awayTeam.updateStats(1, awayScore, homeScore, false, false, true);
+        homeTeam.updateStats(drawPoint, homeScore, awayScore);
+        homeTeam.incrementDraw();
+
+        awayTeam.updateStats(drawPoint, awayScore, homeScore);
+        awayTeam.incrementDraw();
       }
     }
 
