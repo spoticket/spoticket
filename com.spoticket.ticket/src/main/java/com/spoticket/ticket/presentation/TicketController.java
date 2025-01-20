@@ -11,6 +11,7 @@ import com.spoticket.ticket.global.exception.BusinessException;
 import com.spoticket.ticket.global.exception.ErrorCode;
 import com.spoticket.ticket.global.util.ApiResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -67,6 +68,15 @@ public class TicketController {
       throw new BusinessException(ErrorCode.TICKET_NOT_FOUND);
     }
 
+    return ApiResponse.success(tickets, "조회 성공");
+  }
+
+  @GetMapping("/seat/{seatId}")
+  public ApiResponse<List<TicketResponse>> getTicketsBySeatId(@PathVariable UUID seatId) {
+    List<TicketResponse> tickets = ticketService.getTicketsBySeatId(seatId);
+    if (tickets.isEmpty()) {
+      throw new BusinessException(ErrorCode.TICKET_NOT_FOUND);
+    }
     return ApiResponse.success(tickets, "조회 성공");
   }
 

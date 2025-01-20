@@ -14,13 +14,15 @@ public record TicketInfoResponse(
     UUID seatId,
     String userName,
     String gameName,
-    String seatName,
     String stadiumName,
+    String section,
+    String seatName,
+    Integer price,
     TicketStatus status
 ) {
 
-  public static TicketInfoResponse from(Ticket ticket, String userName, String gameTitle,
-      String stadiumName) {
+  public static TicketInfoResponse from(Ticket ticket, String userName, String gameTitle
+      , String stadiumName, String section, Integer price) {
     return TicketInfoResponse.builder()
         .ticketId(ticket.getTicketId())
         .userId(ticket.getUserId())
@@ -30,7 +32,9 @@ public record TicketInfoResponse(
         .userName(userName)
         .gameName(gameTitle)
         .stadiumName(stadiumName)
+        .section(section)
         .seatName(ticket.getSeatName())
+        .price(price)
         .status(ticket.getStatus())
         .build();
   }

@@ -1,6 +1,8 @@
 package com.spoticket.game.infrastructure.repository;
 
 import com.spoticket.game.domain.model.LeagueGame;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -27,6 +29,13 @@ public interface ResultJpaRepository extends JpaRepository<LeagueGame, UUID> {
       "AND lg.isDeleted = false")
   Page<LeagueGame> findAllByLeagueAndIsDeletedFalse(
       @Param("league") UUID league,
-      Pageable pageable
-  );
+      Pageable pageable);
+
+  @Query("SELECT lg FROM p_league_games lg " +
+      "WHERE lg.league.leagueId = :leagueId " +
+      "AND DATE(lg.game.startTime) = :date " +
+      "AND lg.isDeleted = false")
+  List<LeagueGame> findAllByLeagueIdAndDateAndIsDeletedFalse(
+      @Param("leagueId") UUID leagueId,
+      @Param("date") LocalDate date);
 }
