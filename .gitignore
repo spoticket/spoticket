@@ -1,3 +1,5 @@
 .DS_Store
 .idea
-.yml
+application-dev.yml
+application-ec2.yml
+.env
