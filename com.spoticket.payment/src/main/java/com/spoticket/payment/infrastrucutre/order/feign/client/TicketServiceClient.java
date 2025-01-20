@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient("ticket-service")
+@FeignClient("ticket")
 public interface TicketServiceClient {
 
     @GetMapping("api/v1/ticket/{ticketId}")
