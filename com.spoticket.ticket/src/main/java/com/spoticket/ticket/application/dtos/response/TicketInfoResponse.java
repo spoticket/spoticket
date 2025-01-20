@@ -26,7 +26,7 @@ public record TicketInfoResponse(
     return TicketInfoResponse.builder()
         .ticketId(ticket.getTicketId())
         .userId(ticket.getUserId())
-        .gameId(ticket.getTicketId())
+        .gameId(ticket.getGameId())
         .stadiumId(ticket.getStadiumId())
         .seatId(ticket.getSeatId())
         .userName(userName)
