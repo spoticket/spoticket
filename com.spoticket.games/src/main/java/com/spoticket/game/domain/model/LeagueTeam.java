@@ -52,24 +52,24 @@ public class LeagueTeam extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "league_id", nullable = false)
   private League league;
-  
+
   public void updateStats(
-      int points, int goalsFor, int goalsAgainst,
-      boolean isWin, boolean isLoss, boolean isDraw
+      int points, int goalsFor, int goalsAgainst
   ) {
     this.teamScore += points;
     this.totalScore += goalsFor;
     this.totalLoss += goalsAgainst;
-
-    if (isWin) {
-      this.winCnt++;
-    }
-    if (isLoss) {
-      this.defeatCnt++;
-    }
-    if (isDraw) {
-      this.drawCnt++;
-    }
   }
 
+  public void incrementWin() {
+    this.winCnt++;
+  }
+
+  public void incrementDefeat() {
+    this.defeatCnt++;
+  }
+
+  public void incrementDraw() {
+    this.drawCnt++;
+  }
 }
