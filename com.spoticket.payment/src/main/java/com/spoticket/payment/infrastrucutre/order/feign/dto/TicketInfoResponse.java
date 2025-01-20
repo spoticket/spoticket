@@ -3,9 +3,12 @@ package com.spoticket.payment.infrastrucutre.order.feign.dto;
 import com.spoticket.payment.infrastrucutre.order.feign.ticket.TicketStatus;
 import java.util.UUID;
 
-public record TicketInfoResponse (
+
+public record TicketInfoResponse(
     UUID ticketId,
     UUID userId,
+    UUID gameId,
+    UUID stadiumId,
     UUID seatId,
     String userName,
     String gameName,
@@ -14,6 +17,5 @@ public record TicketInfoResponse (
     String seatName,
     Integer price,
     TicketStatus status
-
 ){
 }
