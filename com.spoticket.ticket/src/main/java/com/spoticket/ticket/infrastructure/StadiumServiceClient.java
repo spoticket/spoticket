@@ -1,6 +1,7 @@
 package com.spoticket.ticket.infrastructure;
 
 
+import com.spoticket.ticket.application.dtos.response.SeatReadResponse;
 import com.spoticket.ticket.application.dtos.response.StadiumReadResponse;
 import com.spoticket.ticket.global.config.FeignConfig;
 import com.spoticket.ticket.global.util.ApiResponse;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "team-stadium", configuration = FeignConfig.class)
 public interface StadiumServiceClient {
 
-  @GetMapping("/stadiums/{stadiumId}")
+  @GetMapping("/api/v1/stadiums/{stadiumId}")
   ApiResponse<StadiumReadResponse> getStadiumInfo(@PathVariable UUID stadiumId);
+
+  @GetMapping("/api/v1/stadiums/seats/{seatId}")
+  ApiResponse<SeatReadResponse> getSeat(@PathVariable UUID seatId);
 
 }
