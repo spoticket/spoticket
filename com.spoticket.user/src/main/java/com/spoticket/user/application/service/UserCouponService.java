@@ -10,6 +10,7 @@ import com.spoticket.user.dto.request.UserCouponRequestDto;
 import com.spoticket.user.dto.response.UserCouponResponseDto;
 import com.spoticket.user.global.exception.CustomException;
 import com.spoticket.user.global.util.SuccessResponse;
+import com.spoticket.user.global.util.lock.DistributedLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -34,7 +35,7 @@ public class UserCouponService {
 
     private static final String COUPON_STOCK_KEY = "coupon:stock:";
 
-    @Transactional
+    @DistributedLock(key = "#couponLock")
     public SuccessResponse<?> issueCoupon(UUID currentUserId, String role, UserCouponRequestDto request) {
 
         // 1. Redis에서 쿠폰 재고 확인 및 감소
