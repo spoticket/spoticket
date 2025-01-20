@@ -6,12 +6,9 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Service
@@ -19,10 +16,14 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class OrderKafkaService {
 
     private final KafkaTemplate<String, PaymentRequestEvent> kafkaTemplate;
+    private final KafkaTemplate<String, String> stringKafkaTemplate;
 
 
     @Value("${spring.kafka.topic.payment-request}")
     private String paymentRequestTopic;
+
+    @Value("${spring.kafka.topic.coupon-used}")
+    private String couponUsedTopic;
 
     public void sendPaymentRequest(PaymentRequestEvent event) {
         try {
@@ -47,4 +48,28 @@ public class OrderKafkaService {
         }
             log.info("결제 요청 이벤트가 성공적으로 전송되었습니다. orderId: {}", event.getOrderId());
         }
+    public void sendCouponUsed(UUID userCouponId) {
+
+        try {
+            CompletableFuture<SendResult<String, String>> future =
+                stringKafkaTemplate.send(
+                    couponUsedTopic,
+                    userCouponId.toString()
+                );
+
+            future.whenComplete((result, ex) -> {
+                if (ex == null) {
+                    log.info("쿠폰 사용 이벤트 전송 성공 - userCouponId: {}, partition: {}, offset: {}",
+                        userCouponId,
+                        result.getRecordMetadata().partition(),
+                        result.getRecordMetadata().offset());
+                } else {
+                    log.error("쿠폰 사용 이벤트 전송 실패 - userCouponId: {}", userCouponId, ex);
+                }
+            });
+        } catch (Exception e) {
+            log.error("쿠폰 사용 이벤트 전송 중 오류 발생 - userCouponId: {}", userCouponId, e);
+            throw e;
+        }
+    }
     }
