@@ -8,6 +8,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
@@ -16,18 +17,15 @@ import lombok.ToString;
 @ToString
 public class CreateOrderReq {
 
-    @JsonProperty("userId")
-    private UUID userId;
     private UUID userCouponId;
     private List<OrderItemReq> items = new ArrayList<>();
 
     @Getter
     @NoArgsConstructor
+    @Setter
     @AllArgsConstructor
     public static class OrderItemReq {
         private UUID ticketId;
-        private int price;
-        private String itemName;
     }
 
 }
