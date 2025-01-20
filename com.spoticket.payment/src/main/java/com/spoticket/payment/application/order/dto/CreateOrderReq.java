@@ -18,7 +18,6 @@ public class CreateOrderReq {
 
     @JsonProperty("userId")
     private UUID userId;
-    @JsonIgnore
     private UUID userCouponId;
     private List<OrderItemReq> items = new ArrayList<>();
 
