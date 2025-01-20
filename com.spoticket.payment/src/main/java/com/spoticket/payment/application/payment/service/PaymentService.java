@@ -32,11 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final PaymentConsumerRepository consumerRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final TossPaymentPort paymentPort;
     private final PaymentDomainService paymentDomainService;
     private final PaymentConsumerRepository paymentConsumerRepository;
+    private final PaymentKafkaService paymentKafkaService;
 
 
     @Transactional
@@ -114,6 +114,7 @@ public class PaymentService {
             paymentRes.description(),
             cardCompanyName
         );
+        paymentKafkaService.sendPaymentCompleted(payment.getOrderId(), "DONE");
         return paymentRes;
     }
     public void verifyAmount(long reqAmount, long resAmount ) {
@@ -141,8 +142,15 @@ public class PaymentService {
             payment,
             paymentRes.status()
         );
+        String cardCompanyName = paymentRes.method();
+        int installmentPlanMonths = 0;
 
-        String cardCompanyName = convertCardCompanyName(paymentRes.card().issuerCode());
+        if (paymentRes.card() != null) {
+            if (paymentRes.card().issuerCode() != null) {
+                cardCompanyName = convertCardCompanyName(paymentRes.card().issuerCode());
+            }
+            installmentPlanMonths = paymentRes.card().installmentPlanMonths();
+        }
 
         paymentHistoryRepository.save(
             PaymentHistories.createPaymentStatusHistory(
@@ -151,8 +159,10 @@ public class PaymentService {
                 paymentRes.status(),
                 cancelReason,
                 cardCompanyName,
-                paymentRes.card().installmentPlanMonths())
-        );
+                installmentPlanMonths
+        ));
+        paymentKafkaService.sendPaymentCompleted(payment.getOrderId(), "CANCELED");
+
         return paymentRes;
     }
 
