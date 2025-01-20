@@ -6,12 +6,15 @@ import com.spoticket.payment.infrastrucutre.order.feign.dto.UserCouponResponseDt
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class OrderDomainService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderDomainService.class);
     private final CouponServiceClient couponServiceClient;
 
 
@@ -23,6 +26,7 @@ public class OrderDomainService {
 
     public UserCouponResponseDto validateUserCoupon(UUID couponId, UUID userId) {
         UserCouponResponseDto res = couponServiceClient.getCoupon(couponId);
+        log.info("쿠폰 정보  - Coupon Id: {}, User Id: {},  DiscountRate: {} ", res.couponId(), res.userId(), res.discountRate());
         /*
             클라언트에서 받은 쿠폰 id를 통해서 현재 사용자가 가지고있는 쿠폰인지 검증한다.
          */
