@@ -35,7 +35,7 @@ public class OrderService {
         log.info("create order method: {}", createOrderReq);
 
         List<OrderItem> orderItems = createOrderItems(createOrderReq);
-        log.info("Received userId: {}", createOrderReq.getUserId());
+        log.info("Received userId: {}, couponId:{}", createOrderReq.getUserId(), createOrderReq.getUserCouponId());
 
         Order order = Order.createOrder(userId,
             createOrderReq.getUserCouponId(),
@@ -60,7 +60,6 @@ public class OrderService {
                 .orderId(savedOrder.getOrderId())
                 .itemName(savedOrder.getOrderItems().get(0).getItemName())
                 .amount(savedOrder.getAmount())
-                .userCouponID(createOrderReq.getUserCouponId())
                 .build()
         );
 
