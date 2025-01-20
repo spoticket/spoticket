@@ -79,6 +79,9 @@ public class Order {
         this.amount = orderDomainService.calculatePriceWithCouponDiscount(this.amount, discountRate);
     }
 
+    public void updatedStatus(String status) {
+        this.status = OrderStatus.valueOf(status);
+    }
     public void addOrderItem(List<OrderItem> orderItem) {
         if (this.orderItems == null) {  // 안전장치로 null 체크 추가
             this.orderItems = new ArrayList<>();
