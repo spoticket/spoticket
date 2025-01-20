@@ -1,4 +1,4 @@
-package com.spoticket.payment.application.payment.consumer;
+package com.spoticket.payment.application.payment.listener;
 
 import com.spoticket.payment.application.order.dto.PaymentRequestEvent;
 import com.spoticket.payment.domain.payment.exception.PaymentException;
@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PaymentEventConsumer {
+public class PaymentEventListener {
 
 
     private final PaymentConsumerRepository paymentConsumerRepository;
@@ -26,16 +27,19 @@ public class PaymentEventConsumer {
         groupId = "${spring.kafka.consumer.group-id}",
         containerFactory = "kafkaListenerContainerFactory"
     )
+    @Transactional
     public void consumePaymentRequest(
         @Payload PaymentRequestEvent event,
         @Header(KafkaHeaders.RECEIVED_KEY) String key,
         @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
-        @Header(KafkaHeaders.OFFSET) long offset
+        @Header(KafkaHeaders.OFFSET) long offset,
+        Acknowledgment acknowledgment
     ) {
         log.info("받은 요청 - orderId: {}, itemName: {}, amount: {}, partition: {}, offset: {}",
             event.getOrderId(), event.getItemName(), event.getAmount(), partition, offset);
         try {
             saveTopic(event);
+            acknowledgment.acknowledge();
             log.info("Successfully processed payment request for orderId: {}", event.getOrderId());
         } catch (PaymentException e) {
             log.error("Payment processing failed for orderId: {} - {}", event.getOrderId(), e.getMessage());
@@ -45,8 +49,6 @@ public class PaymentEventConsumer {
             throw e;
         }
     }
-
-    @Transactional
     public void saveTopic(PaymentRequestEvent event) {
         PaymentConsumer consumer = PaymentConsumer.toEntity(
             event.getOrderId(), event.getItemName(), event.getAmount()
