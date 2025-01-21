@@ -16,10 +16,10 @@ public class QueueNotifier {
   private static final Logger logger = LoggerFactory.getLogger(QueueNotifier.class);
   private final QueueService queueService;
 
-  @Scheduled(fixedRate = 3000) // 3초마다 실행
+  @Scheduled(fixedRate = 2000) // 2초마다 실행
   public void notifyQueueUpdates() {
     UUID gameId = UUID.fromString("532369d1-45c3-417d-86d0-cdd0a3bd1750"); // 예제용 Game ID
-    int batchSize = 100; // 한번에 제거할 사용자 수
+    int batchSize = 180; // 한번에 제거할 사용자 수
 
     // 대기열 가져오기
     Set<String> queue = queueService.getQueue(gameId);
