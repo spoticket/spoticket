@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Queue Position</title>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      color: #fff;
+      text-align: center;
+      padding: 0;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .input-group label {
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .input-group input {
+      padding: 10px 15px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 25px;
+      margin-bottom: 15px;
+      width: 250px;
+      text-align: center;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    .input-group button {
+      background-color: #f39c12;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .input-group button:hover {
+      background-color: #e67e22;
+      transform: scale(1.05);
+    }
+
+    .position {
+      font-size: 1.2rem;
+      margin-top: 20px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+<h1>티켓팅 대기열</h1>
+<div class="input-group">
+  <label for="userId">사용자 UUID 입력:</label>
+  <input type="text" id="userId" placeholder="User ID (e.g., UUID)">
+  <button onclick="startPolling()">현재 순서 확인</button>
+</div>
+<div id="queueInfo" class="position">순서 조회를 위한 사용자 UUID를 입력해주세요.</div>
+
+<script>
+  let pollingInterval = null;
+
+  // REST API를 호출하여 대기 순위를 가져오는 함수
+  async function fetchQueuePosition(gameId, userId) {
+    try {
+      const response = await fetch(`/api/v1/wait/${gameId}/position/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch queue position.');
+      }
+
+      const position = await response.json();
+      document.getElementById('queueInfo').textContent =
+          position > 0
+              ? `현재 순서: ${position}`
+              : '입장이 완료되었습니다!';
+    } catch (error) {
+      document.getElementById('queueInfo').textContent = '대기열 정보를 가져올 수 없습니다.';
+      console.error('Error fetching queue position:', error);
+    }
+  }
+
+  // 주기적으로 호출
+  function startPolling() {
+    const userId = document.getElementById('userId').value.trim();
+    const gameId = '532369d1-45c3-417d-86d0-cdd0a3bd1750'; // 게임 ID를 고정하거나 동적으로 설정
+
+    if (!userId) {
+      alert('유효한 사용자 UUID를 입력하세요.');
+      return;
+    }
+
+    // 기존 Interval 제거
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+    }
+
+    // 주기적으로 호출
+    pollingInterval = setInterval(() => {
+      fetchQueuePosition(gameId, userId);
+    }, 5000); // 5초마다 호출
+  }
+</script>
+</body>
+</html>

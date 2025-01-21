@@ -1,4 +1,4 @@
-package com.spoticket.ticket.global.config.redisson;
+package com.spoticket.ticket.global.config.redis.redisson;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.stereotype.Component;

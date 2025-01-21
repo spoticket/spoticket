@@ -13,7 +13,7 @@ import com.spoticket.ticket.application.dtos.response.UserResponseDto;
 import com.spoticket.ticket.domain.entity.Ticket;
 import com.spoticket.ticket.domain.entity.TicketStatus;
 import com.spoticket.ticket.domain.repository.TicketRepository;
-import com.spoticket.ticket.global.config.redisson.DistributedLock;
+import com.spoticket.ticket.global.config.redis.redisson.DistributedLock;
 import com.spoticket.ticket.global.exception.BusinessException;
 import com.spoticket.ticket.global.exception.ErrorCode;
 import com.spoticket.ticket.global.util.ApiResponse;

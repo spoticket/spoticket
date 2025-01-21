@@ -1,4 +1,4 @@
-package com.spoticket.ticket.global.config;
+package com.spoticket.ticket.global.config.redis.redisson;
 
 import java.time.Duration;
 import org.springframework.cache.annotation.EnableCaching;
