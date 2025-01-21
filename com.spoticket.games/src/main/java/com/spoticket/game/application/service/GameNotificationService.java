@@ -2,6 +2,7 @@ package com.spoticket.game.application.service;
 
 import static java.time.LocalDateTime.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spoticket.game.application.dto.response.GameResponse;
@@ -9,14 +10,17 @@ import com.spoticket.game.application.dto.response.SuccessResponse;
 import com.spoticket.game.application.dto.response.TicketResponse;
 import com.spoticket.game.application.dto.response.TicketStatus;
 import com.spoticket.game.application.dto.response.UserResponseDto;
+import com.spoticket.game.common.util.ApiResponse;
 import com.spoticket.game.infrastructure.client.TicketServiceClient;
 import com.spoticket.game.infrastructure.client.UserServiceClient;
 import com.spoticket.game.infrastructure.slack.SlackClient;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -61,8 +65,14 @@ public class GameNotificationService {
   }
 
   private List<TicketResponse> getAllBookedTickets() {
-    return ticketServiceClient
-        .getTickets(TicketStatus.BOOKED, Integer.MAX_VALUE)
+    ApiResponse<Page<TicketResponse>> response = ticketServiceClient
+        .getTickets(TicketStatus.BOOKED, Integer.MAX_VALUE);
+
+    if (response.code() == NOT_FOUND.value()) {
+      return Collections.emptyList();
+    }
+
+    return response
         .data()
         .stream()
         .toList();

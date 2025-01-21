@@ -53,16 +53,25 @@ public class LeagueUpdateService {
 
     int winPoint = 3;
     int defeatPoint = 0;
+    int drawPoint = 1;
     if (homeScore > awayScore) {
-      homeTeam.updateStats(winPoint, homeScore, awayScore, true, false, false);
-      awayTeam.updateStats(defeatPoint, awayScore, homeScore, false, true, false);
+      homeTeam.updateStats(winPoint, homeScore, awayScore);
+      homeTeam.incrementWin();
+
+      awayTeam.updateStats(defeatPoint, awayScore, homeScore);
+      awayTeam.incrementDefeat();
     } else if (homeScore < awayScore) {
-      homeTeam.updateStats(defeatPoint, homeScore, awayScore, false, true, false);
-      awayTeam.updateStats(winPoint, awayScore, homeScore, true, false, false);
+      homeTeam.updateStats(defeatPoint, homeScore, awayScore);
+      homeTeam.incrementDefeat();
+
+      awayTeam.updateStats(winPoint, awayScore, homeScore);
+      awayTeam.incrementWin();
     } else {
-      int drawPoint = 1;
-      homeTeam.updateStats(drawPoint, homeScore, awayScore, false, false, true);
-      awayTeam.updateStats(drawPoint, awayScore, homeScore, false, false, true);
+      homeTeam.updateStats(drawPoint, homeScore, awayScore);
+      homeTeam.incrementDraw();
+
+      awayTeam.updateStats(drawPoint, awayScore, homeScore);
+      awayTeam.incrementDraw();
     }
   }
 
