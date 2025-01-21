@@ -19,19 +19,21 @@ public class OrderItem {
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "order_item_id")
     private UUID orderItemId;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order;
+    @Column(nullable = false)
+    private String itemName;
     @Column(nullable = false)
     private UUID ticketId;
-
     @Column(nullable = false)
     private int price;
-
-    @Column(nullable = false, length = 20)
-    private int quantity;
-
-    @Column(nullable = false, length = 50)
-    private String createdBy;
-
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+
+
+    public void updateOrder(Order order) {
+        this.order = order;
+    }
 }
