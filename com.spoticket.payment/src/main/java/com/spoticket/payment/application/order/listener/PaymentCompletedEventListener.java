@@ -1,5 +1,6 @@
 package com.spoticket.payment.application.order.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spoticket.payment.application.order.dto.PaymentCompletedEvent;
 import com.spoticket.payment.application.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class PaymentCompletedEventListener {
     public void handlePaymentCompleted(
         @Payload PaymentCompletedEvent event,
         Acknowledgment acknowledgment
-    ) {
+    ) throws JsonProcessingException {
         try {
             log.info("결제 완료 이벤트 수신 - orderId: {}", event.getOrderId());
             if (event.getStatus().equals("DONE")) {

@@ -1,6 +1,7 @@
 package com.spoticket.payment.application.order.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.spoticket.payment.application.order.dto.CreateOrderReq;
 import com.spoticket.payment.application.order.dto.OrderRes;
 import com.spoticket.payment.application.order.dto.PaymentRequestEvent;
@@ -93,13 +94,18 @@ public class OrderService {
         return OrderRes.from(order);
     }
     @Transactional
-    public void completeOrder(UUID orderId) {
+    public void completeOrder(UUID orderId) throws JsonProcessingException {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
         if (order.getUserCouponId() != null) {
             orderKafkaService.sendCouponUsed(order.getUserCouponId());
         }
         order.updatedStatus(String.valueOf(OrderStatus.COMPLETED));
+
+        List<UUID> ticketIds = order.getOrderItems().stream()
+            .map(OrderItem::getTicketId)
+            .collect(Collectors.toList());
+        orderKafkaService.sendTicketId(ticketIds);
 
         log.info("주문 상태가 COMPLETED로 업데이트 되었습니다 - orderId: {}", orderId);
     }
