@@ -1,6 +1,6 @@
 package com.spoticket.game.domain.model;
 
-import com.spoticket.game.global.entity.BaseEntity;
+import com.spoticket.game.domain.common.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

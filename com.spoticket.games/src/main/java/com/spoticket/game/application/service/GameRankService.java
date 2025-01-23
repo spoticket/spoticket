@@ -3,13 +3,13 @@ package com.spoticket.game.application.service;
 import static java.lang.Integer.MAX_VALUE;
 import static java.time.LocalDateTime.now;
 
+import com.spoticket.game.application.dto.response.GameResponse;
+import com.spoticket.game.application.dto.response.TicketStatus;
 import com.spoticket.game.domain.model.Game;
 import com.spoticket.game.domain.model.GameRank;
-import com.spoticket.game.domain.repository.GameJpaRepository;
-import com.spoticket.game.domain.repository.GameRankJpaRepository;
-import com.spoticket.game.dto.response.GameResponse;
-import com.spoticket.game.dto.response.TicketStatus;
-import com.spoticket.game.infrastructure.client.TicketClient;
+import com.spoticket.game.infrastructure.client.TicketServiceClient;
+import com.spoticket.game.infrastructure.repository.GameJpaRepository;
+import com.spoticket.game.infrastructure.repository.GameRankJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +29,7 @@ public class GameRankService {
 
   private final GameJpaRepository gameJpaRepository;
   private final GameRankJpaRepository gameRankJpaRepository;
-  private final TicketClient ticketClient;
+  private final TicketServiceClient ticketServiceClient;
 
   public List<GameResponse> getGameRanks() {
     return gameRankJpaRepository.findAllByOrderByScoreDesc().stream()
@@ -73,9 +73,9 @@ public class GameRankService {
 
   private Long getSales(UUID gameId) {
     return Optional.ofNullable(
-            ticketClient
+            ticketServiceClient
                 .getTicketsByGameId(gameId, TicketStatus.BOOKED, MAX_VALUE)
-                .getData()
+                .data()
         )
         .map(Page::getTotalElements)
         .orElse(0L);

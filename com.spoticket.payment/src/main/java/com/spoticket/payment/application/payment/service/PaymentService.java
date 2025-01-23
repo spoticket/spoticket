@@ -3,6 +3,7 @@ package com.spoticket.payment.application.payment.service;
 
 
 
+import com.spoticket.payment.application.payment.dto.PaymentEventRes;
 import com.spoticket.payment.application.payment.dto.PaymentRes;
 import com.spoticket.payment.domain.payment.exception.PaymentErrorCode;
 import com.spoticket.payment.domain.payment.exception.PaymentException;
@@ -10,9 +11,11 @@ import com.spoticket.payment.domain.payment.model.PaymentHistories;
 import com.spoticket.payment.domain.payment.model.PaymentStatus;
 import com.spoticket.payment.domain.payment.model.Payments;
 import com.spoticket.payment.domain.payment.port.TossPaymentPort;
+import com.spoticket.payment.domain.payment.repository.PaymentConsumerRepository;
 import com.spoticket.payment.domain.payment.repository.PaymentHistoryRepository;
 import com.spoticket.payment.domain.payment.repository.PaymentRepository;
 import com.spoticket.payment.domain.payment.service.PaymentDomainService;
+import com.spoticket.payment.infrastrucutre.toss.dto.TossPaymentFailureRequest;
 import com.spoticket.payment.infrastrucutre.toss.dto.TossPaymentReq;
 import com.spoticket.payment.infrastrucutre.toss.dto.TossPaymentRes;
 import java.time.LocalDateTime;
@@ -32,7 +35,8 @@ public class PaymentService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final TossPaymentPort paymentPort;
     private final PaymentDomainService paymentDomainService;
-
+    private final PaymentConsumerRepository paymentConsumerRepository;
+    private final PaymentKafkaService paymentKafkaService;
 
 
     @Transactional
@@ -84,7 +88,15 @@ public class PaymentService {
             paymentRes.status(),
             paymentReq.paymentKey()
         );
-        String cardCompanyName = convertCardCompanyName(paymentRes.card().issuerCode());
+        String cardCompanyName = paymentRes.method();
+        int installmentPlanMonths = 0;
+
+        if (paymentRes.card() != null) {
+            if (paymentRes.card().issuerCode() != null) {
+                cardCompanyName = convertCardCompanyName(paymentRes.card().issuerCode());
+            }
+            installmentPlanMonths = paymentRes.card().installmentPlanMonths();
+        }
         paymentHistoryRepository.save(
             PaymentHistories.createPaymentStatusHistory(
                 payment,
@@ -92,7 +104,7 @@ public class PaymentService {
                 paymentRes.status(),
                 paymentRes.description(),
                 cardCompanyName,
-                paymentRes.card().installmentPlanMonths()
+                installmentPlanMonths
             )
         );
         log.info("결제 승인 완료 응답 - paymentId: {}, method: {}, status: {}, description: {}, cardCompanyName: {}",
@@ -102,6 +114,7 @@ public class PaymentService {
             paymentRes.description(),
             cardCompanyName
         );
+        paymentKafkaService.sendPaymentCompleted(payment.getOrderId(), "DONE");
         return paymentRes;
     }
     public void verifyAmount(long reqAmount, long resAmount ) {
@@ -109,6 +122,13 @@ public class PaymentService {
             throw new PaymentException(PaymentErrorCode.AMOUNT_NOT_EQUAL);
         }
     }
+//    @Transactional
+//    public TossPaymentRes failureRequest(TossPaymentFailureRequest request) {
+//        Payments payments = paymentRepository.findByOrderId(request.orderId())
+//            .orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND));
+//        return paymentHistoryRepository.save(PaymentHistories.createPaymentStatusHistory(payments, e))
+//
+//    }
     @Transactional
     public TossPaymentRes cancelPayment(String paymentKey, String cancelReason) {
         Payments payment = paymentRepository.findByPaymentKey(paymentKey)
@@ -122,8 +142,15 @@ public class PaymentService {
             payment,
             paymentRes.status()
         );
+        String cardCompanyName = paymentRes.method();
+        int installmentPlanMonths = 0;
 
-        String cardCompanyName = convertCardCompanyName(paymentRes.card().issuerCode());
+        if (paymentRes.card() != null) {
+            if (paymentRes.card().issuerCode() != null) {
+                cardCompanyName = convertCardCompanyName(paymentRes.card().issuerCode());
+            }
+            installmentPlanMonths = paymentRes.card().installmentPlanMonths();
+        }
 
         paymentHistoryRepository.save(
             PaymentHistories.createPaymentStatusHistory(
@@ -132,13 +159,21 @@ public class PaymentService {
                 paymentRes.status(),
                 cancelReason,
                 cardCompanyName,
-                paymentRes.card().installmentPlanMonths())
-        );
+                installmentPlanMonths
+        ));
+        paymentKafkaService.sendPaymentCompleted(payment.getOrderId(), "CANCELED");
+
         return paymentRes;
     }
 
     private String convertCardCompanyName(String issuerCode) {
         return paymentPort.getCardCompanyName(issuerCode);
+    }
+
+    public PaymentEventRes getEvent(UUID orderId) {
+        return paymentConsumerRepository.findByOrderId(orderId)
+            .map(PaymentEventRes::from)
+            .orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND));
     }
 
     public PaymentRes getPayment(UUID paymentId) {

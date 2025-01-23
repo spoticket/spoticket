@@ -15,14 +15,20 @@ import com.spoticket.user.global.exception.CustomException;
 import com.spoticket.user.global.util.SuccessResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CouponService {
 
   private final CouponRepository couponRepository;
+  private final StringRedisTemplate redisTemplate; // Redis를 위한 Template
+
+  private static final String COUPON_STOCK_KEY = "coupon:stock:";
 
   @Transactional
   public SuccessResponse<?> create(CouponCreateRequestDto request) {
@@ -42,6 +48,8 @@ public class CouponService {
     );
 
     couponRepository.save(coupon);
+
+    initializeCouponStock(coupon.getCouponId(), coupon.getStock());
 
     return SuccessResponse.of(COUPON_CREATE);
   }
@@ -99,5 +107,12 @@ public class CouponService {
     );
 
     return SuccessResponse.ok(response);
+  }
+
+  // 쿠폰 발급을 위한 메서드 목록
+  public void initializeCouponStock(UUID couponId, Long stock) {
+    String redisKey = COUPON_STOCK_KEY + couponId;
+    redisTemplate.opsForValue().set(redisKey, String.valueOf(stock));
+    log.info("🚩🚩 [CouponService] Redis에 쿠폰 등록 {} 🚩🚩", couponId);
   }
 }
