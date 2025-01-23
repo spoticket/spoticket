@@ -2,4 +2,3 @@
 .idea
 application-dev.yml
 application-prod.yml
-.env
