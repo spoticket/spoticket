@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./com.spoticket.server
+    image: server
+    ports:
+      - "8761:8761"
+    networks:
+      - spoticket-network
+
+  gateway:
+    build:
+      context: ./com.spoticket.gateway
+    image: gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+
+  user:
+    build:
+      context: ./com.spoticket.user
+    image: user
+    ports:
+      - "8081:8081"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+
+  team-stadium:
+    build:
+      context: ./com.spoticket.team-stadium
+    image: team-stadium
+    ports:
+      - "8082:8082"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+
+  game:
+    build:
+      context: ./com.spoticket.games
+    image: game
+    ports:
+      - "8083:8083"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+
+  payment:
+    build:
+      context: ./com.spoticket.payment
+    image: payment
+    ports:
+      - "8084:8084"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+
+  ticket:
+    build:
+      context: ./com.spoticket.ticket
+    image: ticket
+    ports:
+      - "8085:8085"
+    depends_on:
+      - server
+    networks:
+      - spoticket-network
+
+networks:
+  spoticket-network:
+    driver: bridge

@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: server
+
+server:
+  port: 8761
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://13.125.249.226/eureka
+    register-with-eureka: false
+    fetch-registry: false
