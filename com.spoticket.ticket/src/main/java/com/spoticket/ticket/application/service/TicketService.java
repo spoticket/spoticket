@@ -24,7 +24,6 @@ import com.spoticket.ticket.infrastructure.UserServiceClient;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -51,8 +50,8 @@ public class TicketService {
   @DistributedLock(key = "#request.seatName")
   public TicketResponse createTicket(CreateTicketRequest request) {
     // 좌석이 이미 예약되었는지 확인
-    boolean isSeatAlreadyReserved = ticketRepository.existsBySeatNameAndStatus(request.seatName(),
-        TicketStatus.PICKED);
+    boolean isSeatAlreadyReserved = ticketRepository.existsBySeatNameAndStatusIn(request.seatName(),
+        List.of(TicketStatus.PICKED, TicketStatus.BOOKED));
     if (isSeatAlreadyReserved) {
       throw new BusinessException(ErrorCode.SEAT_ALREADY_RESERVED); // 좌석 예약 실패
     }
@@ -111,7 +110,7 @@ public class TicketService {
     List<Ticket> tickets = ticketRepository.findAllBySeatId(seatId);
     return tickets.stream()
         .map(TicketResponse::from)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @Transactional
@@ -142,7 +141,7 @@ public class TicketService {
   private void updateSeatTicketsCache(UUID seatId) {
     List<TicketResponse> tickets = ticketRepository.findAllBySeatId(seatId).stream()
         .map(TicketResponse::from)
-        .collect(Collectors.toList());
+        .toList();
     seatListTemplate.opsForValue().set(CACHE_KEY_SEAT_TICKETS + seatId, tickets,
         Duration.ofHours(1));
   }
