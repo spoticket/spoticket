@@ -55,5 +55,6 @@ public class TicketKafkaService {
       log.error("티켓 상태 업데이트 중 오류 발생 - ticketId: {}", ticketId, e);
     }
   }
+
 }
 
